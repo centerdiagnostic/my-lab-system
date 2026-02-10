@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Data Management System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            important: '#wp-lab-app-container',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                    colors: { 
+                        brand: { 
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 
+                            500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 
+                            800: '#115e59', primary: '#0891b2'
+                        } 
+                    },
+                    borderRadius: { '4xl': '2.5rem', '5xl': '3.5rem' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0f766e; margin: 0; font-family: 'Prompt', sans-serif; }
+        
+        /* --- Login Styles (Fixed & Modernized) --- */
+        #login-overlay { 
+            position: fixed; inset: 0; 
+            background-color: #115e59; 
+            background-image: radial-gradient(circle at top right, #0d9488, #115e59);
+            z-index: 9999; 
+            display: flex; justify-content: center; align-items: center; padding: 1rem;
+        }
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 2.5rem;
+            padding: 3.5rem 2.5rem;
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .icon-container {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 6rem; height: 6rem;
+            background-color: #ccfbf1; /* สีพื้นหลังไอคอนเขียวอ่อน */
+            border-radius: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        /* บังคับขนาดไอคอนขวดชมพู่ให้พอดี */
+        .icon-container svg { width: 3.5rem; height: 3.5rem; color: #0f766e; }
+        
+        .login-input-group { position: relative; margin-bottom: 1.25rem; }
+        
+        /* แก้ไขไอคอนในช่องกรอกไม่ให้เพี้ยน */
+        .login-input-icon {
+            position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; 
+            width: 20px !important; height: 20px !important;
+            pointer-events: none;
+        }
+        
+        .login-input {
+            width: 100%;
+            background-color: #f8fafc;
+            border: 2px solid transparent;
+            padding: 1.1rem 1rem 1.1rem 3.5rem; /* เว้นระยะซ้ายเผื่อไอคอน */
+            border-radius: 1.25rem;
+            outline: none;
+            font-weight: 600; color: #334155; font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .login-input:focus { 
+            background-color: #ffffff; 
+            border-color: #2dd4bf; 
+            box-shadow: 0 4px 12px -2px rgba(45, 212, 191, 0.2); 
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #14b8a6, #0f766e);
+            color: white;
+            padding: 1.1rem;
+            border-radius: 1.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.4);
+            margin-top: 1.5rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(20, 184, 166, 0.5); }
+        .login-btn:active { transform: scale(0.98); }
+
+        /* --- Main App Styles (Original) --- */
+        #wp-lab-app-container { display: block; font-family: 'Prompt', sans-serif !important; background-color: #f8fafc; min-height: 100vh; padding: 1.5rem; color: #1e293b; }
+        #wp-lab-app-container * { box-sizing: border-box; }
+        .hidden-important { display: none !important; }
+        
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .tab-active { background: #ffffff !important; color: #0891b2 !important; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+        .sub-tab-active { background-color: #0891b2 !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .custom-table-row:hover { background-color: #f1f5f9 !important; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .grid-container { display: grid; grid-template-columns: 40px repeat(10, 1fr); gap: 6px; width: 100%; min-width: 450px; }
+        .grid-cell { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; border: 1px solid #e2e8f0; border-radius: 8px; background-color: white; cursor: pointer; transition: all 0.2s; }
+        .grid-cell:hover:not(.cursor-not-allowed) { background-color: #ecfeff; border-color: #06b6d4; transform: scale(1.05); }
+        .grid-cell.occupied { background-color: #0891b2; color: white; }
+        .grid-cell.in-form-selected { border: 2px solid #0891b2; background-color: #e0f2fe; color: #0891b2; }
+        .grid-cell.selected { border: 2px solid #ef4444; background-color: #fee2e2; color: #ef4444; }
+        .label-cell { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #1e293b; }
+        .low-level-pulse { animation: pulse-red 2s infinite; background-color: #fee2e2 !important; color: #b91c1c !important; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .input-readonly { background-color: #f8fafc !important; color: #475569 !important; cursor: not-allowed; }
+        .hero-title { color: #ffffff !important; font-weight: 700 !important; }
+        .hero-subtitle { color: #cffafe !important; opacity: 0.9 !important; }
+        .input-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+        .error-text { color: #ef4444 !important; font-size: 10px !important; font-weight: 700 !important; margin-top: 4px; display: block; }
+        .bp-badge { font-size: 9px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #64748b; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div id="login-overlay">
+    <div class="login-card animate-in zoom-in-95 duration-300">
+        <div class="icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/>
+                <path d="M8.5 2h7"/>
+                <path d="M7 16h10"/>
+            </svg>
+        </div>
+
+        <h2 class="text-3xl font-bold text-slate-800 mb-2">ยินดีต้อนรับ</h2>
+        <p class="text-slate-500 font-medium mb-10 text-sm">Lab Data Management System</p>
+
+        <form id="loginForm">
+            <div class="login-input-group">
+                <svg class="login-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="email" id="loginEmail" class="login-input" placeholder="ADMIN LAB" required>
+            </div>
+            
+            <div class="login-input-group">
+                <svg class="login-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="loginPassword" class="login-input" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+        </form>
+        
+        <p id="loginError" class="text-red-500 text-xs font-bold mt-4 hidden bg-red-50 p-2 rounded-lg border border-red-100"></p>
+        
+        <div class="mt-8 pt-4 border-t border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Authorized Personnel Only</p>
+        </div>
+    </div>
+</div>
+
+<div id="wp-lab-app-container" class="hidden-important">
+    <div class="max-w-7xl mx-auto space-y-8 text-slate-900">
+        <div class="relative overflow-hidden bg-gradient-to-br from-cyan-700 to-teal-800 rounded-4xl p-8 md:p-12 text-white shadow-2xl">
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 bg-white/20 px-4 py-1 rounded-full text-[10px] font-bold mb-4 backdrop-blur-md uppercase tracking-widest text-white">Lab Inventory System</div>
+                    <h1 class="text-4xl font-bold tracking-tight hero-title">คลังเก็บ PRIMER & PROBE</h1>
+                    <div class="flex items-center flex-wrap gap-4 mt-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <p class="font-medium hero-subtitle text-sm">ผู้ใช้งาน: <span id="userNameDisplay" class="font-bold text-white">Loading...</span></p>
+                        </div>
+                        <button onclick="handleLogout()" class="bg-white/10 hover:bg-red-500/40 px-4 py-1.5 rounded-xl border border-white/20 flex items-center gap-2 transition-all active:scale-95 group text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            <span class="text-[10px] font-bold uppercase tracking-wider">ออกจากระบบ</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="fetchData()" class="bg-white/10 hover:bg-white/20 p-4 rounded-2xl border border-white/30 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:rotate-180 transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </button>
+                    <button onclick="toggleForm('PRIMER')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 px-7 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl active:scale-95 border-b-4 border-amber-700/30">
+                        <span class="p-1.5 bg-white/30 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></span> PRIMER
+                    </button>
+                    <button onclick="toggleForm('PROBE')" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl active:scale-95 border-b-4 border-indigo-900/30">
+                        <span class="p-1.5 bg-white/20 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></span> PROBE
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-nav sticky top-4 z-40 p-2 rounded-3xl flex flex-wrap gap-2 shadow-md border border-slate-200">
+            <button onclick="switchTab('all')" id="tab-all" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">รายการทั้งหมด</button>
+            <button onclick="switchTab('stock')" id="tab-stock" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">จัดการสต๊อก</button>
+            <button onclick="switchTab('movement')" id="tab-movement" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">บันทึกการใช้งาน</button>
+            <button onclick="switchTab('storage')" id="tab-storage" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">แผนผัง (Box Map)</button>
+            <button onclick="switchTab('export')" id="tab-export" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">ส่งออกข้อมูล</button>
+            <button onclick="switchTab('history')" id="tab-history" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">ประวัติรายการ</button>
+        </div>
+
+        <div id="stock-sub-tabs" class="hidden flex flex-wrap gap-3 justify-center">
+            <button onclick="switchStockSub('stock-primer')" id="sub-tab-stock-primer" class="px-8 py-2 rounded-xl text-[10px] font-bold border border-slate-300 bg-white">STOCK PRIMER</button>
+            <button onclick="switchStockSub('stock-probe')" id="sub-tab-stock-probe" class="px-8 py-2 rounded-xl text-[10px] font-bold border border-slate-300 bg-white">STOCK PROBE</button>
+            <button onclick="switchStockSub('out-of-stock')" id="sub-tab-out-of-stock" class="px-8 py-2 rounded-xl text-[10px] font-bold border border-slate-300 bg-white">Out of stock</button>
+        </div>
+
+        <div id="data-form" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
+            <div class="bg-white rounded-4xl shadow-xl border border-slate-200 p-8 md:p-10">
+                <div class="flex items-center justify-between mb-8 border-b pb-6">
+                    <h2 id="formTitle" class="text-2xl font-bold">จัดการข้อมูล</h2>
+                    <button onclick="toggleForm()" class="p-2 rounded-full hover:bg-slate-100 text-slate-400">✕</button>
+                </div>
+                <form id="labForm" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <input type="hidden" name="id" id="editingId">
+                    <input type="hidden" name="itemtype" id="field_itemType">
+                    
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">ข้อมูลทั่วไป</h3>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Date Ordered</label><input type="date" name="orderDate" id="field_orderDate" required class="w-full rounded-xl border-slate-300 p-3 text-sm focus:ring-2 focus:ring-cyan-500 border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Animal Type</label><select name="animalType" id="field_animalType" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">เลือกประเภทสัตว์</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option></select></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Species</label><input type="text" name="species" id="field_species" list="list_species" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Disease Name</label><input type="text" name="disease" id="field_disease" list="list_disease" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Company Name</label><input type="text" name="company" id="field_company" list="list_company" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reference</label><textarea name="reference" id="field_reference" rows="2" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></textarea></div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">รายละเอียด</h3>
+                        <div><label id="label_name" class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Name</label><input type="text" name="primerName" id="field_primerName" required class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Original Name</label><input type="text" name="originalName" id="field_originalName" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">TA (°C)</label><input type="text" name="ta" id="field_ta" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Size (bp)</label><input type="text" name="productSize" id="field_productSize" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        </div>
+                        <div id="group_probe" class="space-y-4">
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Probe Seq <span id="probe_counter" class="bp-badge">0 bp.</span></label><input type="text" name="probe" id="field_probe" oninput="updateBP('field_probe', 'probe_counter')" class="w-full rounded-xl border-slate-300 p-3 text-sm font-mono border outline-none"></div>
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Fluorescent</label><select name="fluorescent" id="field_fluorescent" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="FAM">FAM</option><option value="HEX">HEX</option><option value="VIC">VIC</option><option value="Cy5">Cy5</option><option value="TXR">TXR</option></select></div>
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Target Gene</label><input type="text" name="targetGene" id="field_targetGene" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        </div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Method</label><select name="method" id="field_method" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="PCR">PCR</option><option value="RT-PCR">RT-PCR</option><option value="qPCR">qPCR</option><option value="RT-qPCR">RT-qPCR</option><option value="ddPCR">ddPCR</option></select></div>
+                        <div id="group_primer" class="grid grid-cols-2 gap-3">
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Forward <span id="fwd_counter" class="bp-badge">0 bp.</span></label><input type="text" name="forward" id="field_forward" oninput="updateBP('field_forward', 'fwd_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reverse <span id="rev_counter" class="bp-badge">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" oninput="updateBP('field_reverse', 'rev_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">Storage & Monitoring</h3>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Box Name</label><input type="text" name="box" id="form_box" list="list_box_options" required class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none font-bold text-slate-900"><span id="box_error" class="error-text hidden">กรุณาระบุชื่อกล่องก่อนเลือกพิกัด Slot</span></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Slot</label>
+                            <div id="slotInputContainer" class="space-y-2"><div class="flex gap-1"><input type="text" name="slot" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" readonly><button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg></button></div></div>
+                            <button type="button" id="btn_add_slot" onclick="addSlotField()" class="mt-2 text-[10px] font-bold text-brand-600 uppercase">+ Add Slot</button>
+                            <span id="slot_conflict_error" class="error-text hidden">ตำแหน่ง Slot นี้ถูกใช้งานแล้ว โปรดเปลี่ยนตำแหน่งใหม่</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Volume (ul)</label><input type="number" name="volume" id="field_volume" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-emerald-700 border outline-none"></div>
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Low Level</label><input type="number" name="lowLevel" id="field_lowLevel" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-red-600 border outline-none"></div>
+                        </div>
+                        <div id="movement_extra" class="hidden animate-in slide-in-from-top-2 duration-300">
+                            <label class="block text-[11px] font-bold text-brand-700 mb-1 uppercase tracking-wider">ใช้ไป (ul)</label>
+                            <input type="number" id="field_usedAmount" oninput="calculateRemainingVol()" placeholder="ระบุจำนวนที่ใช้" class="w-full rounded-xl bg-brand-50 border-brand-200 border p-3 text-sm font-bold text-brand-900 outline-none">
+                        </div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Usage Count</label><input type="number" name="usageCount" id="field_usageCount" class="w-full rounded-xl bg-amber-50 p-3 text-sm font-bold text-amber-700 border-amber-200 border outline-none"></div>
+                    </div>
+
+                    <div class="md:col-span-3 flex justify-end gap-4 pt-6 border-t mt-4">
+                        <button type="button" onclick="toggleForm()" class="px-8 py-3 text-slate-900 font-bold hover:text-slate-700 text-sm uppercase">Cancel</button>
+                        <button type="submit" id="submitBtn" class="bg-cyan-700 hover:bg-cyan-800 text-white px-12 py-4 rounded-2xl font-bold shadow-xl active:scale-95 uppercase">Save Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-list" class="space-y-6">
+            <div class="bg-white p-6 rounded-4xl shadow-md border border-slate-200 space-y-6">
+                <div class="flex flex-col md:flex-row gap-6 justify-between items-center">
+                    <div class="relative w-full md:max-w-md">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-900"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></span>
+                        <input type="text" id="searchMain" onkeyup="filterTable()" placeholder="ค้นหาข้อมูล..." class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white outline-none text-sm font-bold">
+                    </div>
+                    <div class="flex gap-4">
+                        <div id="rowCountDisplay" class="px-8 py-3 bg-brand-primary text-white rounded-full text-xs font-bold uppercase">0 ITEMS FOUND</div>
+                        <button id="btn-export-excel" onclick="exportToExcel()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 uppercase text-[10px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-[10px]">
+                    <div class="space-y-1"><label class="font-bold ml-1 text-slate-400">Date From</label><input type="date" id="filterDateFrom" onchange="filterTable()" class="w-full rounded-xl border border-slate-300 p-2"></div>
+                    <div class="space-y-1"><label class="font-bold ml-1 text-slate-400">Date To</label><input type="date" id="filterDateTo" onchange="filterTable()" class="w-full rounded-xl border border-slate-300 p-2"></div>
+                    <select id="filterAnimal" onchange="filterTable()" class="rounded-xl border border-slate-300 p-2 font-bold bg-white mt-5">
+                        <option value="">Animal (All)</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option>
+                    </select>
+                    <select id="filterSpecies" onchange="filterTable()" class="rounded-xl border border-slate-300 p-2 font-bold bg-white mt-5"><option value="">Species (All)</option></select>
+                    <select id="filterMethod" onchange="filterTable()" class="rounded-xl border border-slate-300 p-2 font-bold bg-white mt-5"><option value="">Method (All)</option></select>
+                    <select id="filterStatus" onchange="filterTable()" class="rounded-xl border border-slate-300 p-2 font-bold bg-white mt-5"><option value="">Status (All)</option><option value="in">In Stock</option><option value="out">Out of stock</option></select>
+                    <select id="filterBox" onchange="filterTable()" class="rounded-xl border border-slate-300 p-2 font-bold bg-white mt-5"><option value="">Box (All)</option></select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-4xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-100 text-slate-900 uppercase text-[9px] font-bold tracking-widest border-b">
+                            <tr>
+                                <th class="px-6 py-5 text-center w-12">No.</th>
+                                <th class="px-6 py-5 text-center">Date</th>
+                                <th class="px-6 py-5 text-center">ID</th>
+                                <th class="px-6 py-5 text-center">Animal</th>
+                                <th class="px-6 py-5 text-center">Species</th>
+                                <th class="px-6 py-5">Name</th>
+                                <th class="px-6 py-5 text-center">Box/Slot</th>
+                                <th class="px-6 py-5 text-center">Vol. (ul)</th>
+                                <th id="th-actions" class="px-6 py-5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="divide-y divide-slate-100 text-sm font-bold text-slate-900"></tbody>
+                    </table>
+                </div>
+                <div class="p-6 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4 border-t">
+                    <div class="flex items-center gap-2 text-xs font-bold uppercase"><span>Limit:</span><select id="rowsPerPageSelect" onchange="changeRowsPerPage()" class="bg-white border rounded-lg p-1 outline-none"><option value="10">10</option><option value="20">20</option><option value="50">50</option></select></div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="prevPage()" id="prevPageBtn" class="p-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 disabled:opacity-50 font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                        <span class="text-[10px] font-bold bg-white border border-slate-300 px-6 py-2 rounded-xl uppercase tracking-widest">Page <span id="currentPageDisplay">1</span> / <span id="totalPagesDisplay">1</span></span>
+                        <button onclick="nextPage()" id="nextPageBtn" class="p-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 disabled:opacity-50 font-bold"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-storage" class="hidden animate-in fade-in duration-300">
+            <div class="bg-white rounded-4xl p-8 md:p-10 shadow-md border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between mb-12 gap-6">
+                    <div><h2 class="text-2xl font-bold">Storage Visual Map</h2><p class="text-slate-500 text-sm font-bold uppercase tracking-wide">ตำแหน่งการจัดเก็บ (Grid 10x10)</p></div>
+                    <select id="mapSelectBox" onchange="renderBoxMap()" class="min-w-[240px] rounded-2xl border-slate-300 border p-4 text-sm font-bold bg-white shadow-sm"></select>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <div class="bg-slate-100 p-6 md:p-10 rounded-4xl border border-slate-200 shadow-inner w-full max-w-2xl overflow-x-auto">
+                        <div class="grid-container" id="main-grid-container"></div>
+                    </div>
+                    <div class="flex-1">
+                        <div id="slot-no-data" class="h-full min-h-[300px] flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-300 rounded-4xl p-12 bg-slate-50/50">
+                            <p class="text-center font-bold uppercase tracking-widest text-xs">เลือก Slot บนผังพิกัดเพื่อดูข้อมูล</p>
+                        </div>
+                        <div id="slot-data-panel" class="hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-history" class="hidden animate-in fade-in duration-300">
+            <div class="bg-white rounded-4xl p-8 md:p-10 shadow-md border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Activity Logs</h2>
+                    <div class="flex flex-wrap gap-3 items-end">
+                        <div class="flex flex-col"><label class="text-[9px] font-bold text-slate-400 ml-1">From</label><input type="date" id="hist_DateFrom" onchange="renderHistory(true)" class="text-xs p-2 border rounded-xl"></div>
+                        <div class="flex flex-col"><label class="text-[9px] font-bold text-slate-400 ml-1">To</label><input type="date" id="hist_DateTo" onchange="renderHistory(true)" class="text-xs p-2 border rounded-xl"></div>
+                        <select id="hist_field_filter" onchange="renderHistory(true)" class="text-xs p-2.5 border rounded-xl font-bold">
+                            <option value="">กรองตามฟิลด์ (All)</option>
+                            <option value="Name">ชื่อ (Name)</option>
+                            <option value="Volume">ปริมาณ (Volume)</option>
+                            <option value="Box">กล่อง/ตำแหน่ง (Storage)</option>
+                        </select>
+                        <input type="text" id="hist_search" onkeyup="renderHistory(true)" placeholder="ค้นหาประวัติ..." class="text-xs p-2.5 border rounded-xl min-w-[200px]">
+                    </div>
+                </div>
+                <div id="historyListContainer" class="space-y-4 pr-2 min-h-[400px]"></div>
+                
+                <div class="mt-8 flex justify-center items-center gap-4">
+                    <button onclick="prevHistPage()" id="prevHistBtn" class="p-2 rounded-xl bg-white border hover:bg-slate-50 disabled:opacity-50 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <span class="text-xs font-bold bg-white border px-6 py-2 rounded-xl">Page <span id="currentHistPageDisplay">1</span> / <span id="totalHistPagesDisplay">1</span></span>
+                    <button onclick="nextHistPage()" id="nextHistBtn" class="p-2 rounded-xl bg-white border hover:bg-slate-50 disabled:opacity-50 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="slotPickerModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSlotPicker()"></div>
+        <div class="relative bg-white w-full max-w-xl rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95">
+            <div class="flex justify-between items-center mb-8"><h3 class="text-lg font-bold uppercase tracking-widest">Select Coordinate</h3><button onclick="closeSlotPicker()" class="p-2 hover:text-red-500 font-bold text-xl">✕</button></div>
+            <div class="bg-slate-100 p-6 rounded-[32px] border-2 border-slate-200 shadow-inner overflow-x-auto">
+                <div class="grid-container" id="picker-grid-container"></div>
+            </div>
+            <div class="mt-8 flex justify-between items-center text-[10px] font-bold uppercase"><span>* BLUE = OCCUPIED / BORDERED = IN-FORM</span><button onclick="closeSlotPicker()" class="px-10 py-3 bg-slate-900 text-white rounded-2xl uppercase shadow-lg">Confirm</button></div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-[40px] flex flex-col shadow-2xl animate-in zoom-in-95">
+            <div class="flex justify-between items-center p-8 border-b bg-slate-50/50"><h2 id="modalPrimerName" class="font-bold text-2xl text-brand-700 tracking-tight leading-tight uppercase">รายละเอียดข้อมูล</h2><button onclick="closeModal()" class="text-slate-900 hover:text-red-500 text-2xl">✕</button></div>
+            <div id="modalContent" class="overflow-y-auto p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm custom-scrollbar"></div>
+            <div class="p-8 border-t bg-slate-50/50 flex justify-end"><button onclick="closeModal()" class="px-12 py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-md active:scale-95 transition-all">Close Report</button></div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-[32px] p-10 text-center shadow-2xl animate-in slide-in-from-bottom-4">
+            <h3 class="font-bold text-xl mb-4 uppercase">Confirm Delete?</h3>
+            <p id="deleteItemName" class="text-sm text-slate-500 mb-10 font-bold italic"></p>
+            <div class="flex gap-4"><button onclick="closeDeleteModal()" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold uppercase border">No</button><button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-lg uppercase">Yes, Delete</button></div>
+        </div>
+    </div>
+
+    <datalist id="list_species"></datalist>
+    <datalist id="list_disease"></datalist>
+    <datalist id="list_company"></datalist>
+    <datalist id="list_box_options"></datalist>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // --- CONFIGURATION ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyD2pLE5sawgLjb4zDzWbJcmLjiIhVE3Uic",
+        authDomain: "lab-inventory-system-9bde3.firebaseapp.com",
+        projectId: "lab-inventory-system-9bde3",
+        storageBucket: "lab-inventory-system-9bde3.firebasestorage.app",
+        messagingSenderId: "209984675103",
+        appId: "1:209984675103:web:92944e1b7dd9f6b7b2e42a",
+        measurementId: "G-714MSN4XY6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app); 
+    const db = getFirestore(app);
+    const auth = getAuth(app); 
+    const COLLECTION_NAME = "lab_items"; 
+    const LOGS_COLLECTION = "activity_logs"; 
+
+    // --- USER MANAGEMENT ---
+    const USER_MAPPING = {
+        "aunzero2536@hotmail.com": "กฤษฏิหิรัญ วรมหัทฐานนท์", 
+        "staff@lab.com": "Nong Ploy",
+    };
+
+    function getUserName(email) {
+        return USER_MAPPING[email] || email; 
+    }
+
+    // --- AUTH LOGIC ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('login-overlay').classList.add('hidden-important');
+            document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
+            
+            const displayName = getUserName(user.email);
+            document.getElementById('userNameDisplay').innerText = displayName;
+            
+            fetchData(); 
+            showToast(`ยินดีต้อนรับคุณ ${displayName} เข้าสู่ระบบ`, "success");
+        } else {
+            document.getElementById('login-overlay').classList.remove('hidden-important');
+            document.getElementById('wp-lab-app-container').classList.add('hidden-important');
+        }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        const errorMsg = document.getElementById('loginError');
+        
+        signInWithEmailAndPassword(auth, email, pass)
+            .then(() => {
+                errorMsg.classList.add('hidden');
+                saveHistoryLog("User Login", "System", ["Logged in successfully"]);
+            })
+            .catch((error) => {
+                errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+                errorMsg.classList.remove('hidden');
+            });
+    });
+
+    window.handleLogout = function() {
+        signOut(auth).then(() => { window.location.reload(); }).catch((error) => { console.error(error); });
+    }
+
+    // --- MAIN APP LOGIC ---
+    let dataList = []; 
+    let filteredList = [];
+    let isEditMode = false;
+    let isMovementMode = false;
+    let currentFormType = 'PRIMER';
+    let activeTab = 'all';
+    let activeStockSub = 'stock-primer'; 
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let activeSlotInput = null;
+    let onlineLogs = [];
+    let historyCurrentPage = 1;
+    const historyRowsPerPage = 10;
+
+    window.fetchData = function() { 
+        onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
+            dataList = snapshot.docs.map(doc => {
+                let data = doc.data();
+                return { ...data, id: doc.id }; 
+            });
+            filterTable(); 
+            updateFilterSuggestions(dataList); 
+            updateBoxOptions(dataList); 
+        }, (error) => { console.error("Error fetching data: ", error); });
+
+        const q = query(collection(db, LOGS_COLLECTION), orderBy("ts", "desc"), limit(200));
+        onSnapshot(q, (snapshot) => {
+            onlineLogs = snapshot.docs.map(doc => doc.data());
+            renderHistory();
+        });
+    };
+
+    window.saveHistoryLog = async function(action, name, details = []) {
+        if (!auth.currentUser) return;
+        const userEmail = auth.currentUser.email;
+        const userName = getUserName(userEmail);
+        
+        try {
+            await addDoc(collection(db, LOGS_COLLECTION), {
+                ts: new Date().toISOString(),
+                action: action,
+                name: name,
+                details: details,
+                by: userName,
+                email: userEmail
+            });
+        } catch (e) {
+            console.error("Error saving log:", e);
+        }
+    };
+
+    window.renderHistory = function(resetPage = false) {
+        if (resetPage) historyCurrentPage = 1;
+        const container = document.getElementById('historyListContainer'); if (!container) return;
+        const qText = document.getElementById('hist_search').value.toLowerCase();
+        const dFrom = document.getElementById('hist_DateFrom').value;
+        const dTo = document.getElementById('hist_DateTo').value;
+        const fField = document.getElementById('hist_field_filter').value.toLowerCase();
+
+        const filteredLogs = onlineLogs.filter(l => {
+            const dateMatch = (!dFrom || new Date(l.ts) >= new Date(dFrom)) && (!dTo || new Date(l.ts) <= new Date(dTo));
+            const searchMatch = !qText || String(l.name).toLowerCase().includes(qText) || String(l.action).toLowerCase().includes(qText) || (l.by && String(l.by).toLowerCase().includes(qText));
+            let fieldMatch = true;
+            if (fField) {
+                const detailStr = (l.details || []).join(' ').toLowerCase();
+                if (fField === 'name') fieldMatch = String(l.name).toLowerCase().includes(qText) || detailStr.includes('name');
+                if (fField === 'volume') fieldMatch = detailStr.includes('vol') || detailStr.includes('ปริมาณ');
+                if (fField === 'box') fieldMatch = detailStr.includes('box') || detailStr.includes('slot') || detailStr.includes('storage');
+            }
+            return dateMatch && searchMatch && fieldMatch;
+        });
+
+        const totalPages = Math.ceil(filteredLogs.length / historyRowsPerPage) || 1;
+        document.getElementById('totalHistPagesDisplay').innerText = totalPages;
+        document.getElementById('currentHistPageDisplay').innerText = historyCurrentPage;
+        document.getElementById('prevHistBtn').disabled = (historyCurrentPage === 1);
+        document.getElementById('nextHistBtn').disabled = (historyCurrentPage === totalPages);
+
+        const start = (historyCurrentPage - 1) * historyRowsPerPage;
+        const pageLogs = filteredLogs.slice(start, start + historyRowsPerPage);
+
+        if (pageLogs.length === 0) { container.innerHTML = `<div class='text-center py-20 opacity-40 uppercase font-bold text-xs'>No logs found.</div>`; return; }
+        
+        container.innerHTML = pageLogs.map(l => `
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 animate-in fade-in duration-200">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary font-bold">L</div>
+                    <div class="flex-1">
+                        <span class="block text-xs font-bold">${l.name}</span>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">${l.action} • ${formatDateFull(l.ts)}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-1 rounded-lg">By: ${l.by || 'Unknown'}</span>
+                    </div>
+                </div>
+                ${l.details && l.details.length ? `<div class="ml-14 mt-2 p-2 bg-white border rounded-xl text-[10px] text-slate-500 font-mono">${l.details.map(d => `<div>• ${d}</div>`).join('')}</div>` : ''}
+            </div>`).join('');
+    };
+
+    window.prevHistPage = function() { if (historyCurrentPage > 1) { historyCurrentPage--; renderHistory(); } };
+    window.nextHistPage = function() { if (historyCurrentPage < Math.ceil(onlineLogs.length / historyRowsPerPage)) { historyCurrentPage++; renderHistory(); } };
+
+    window.renderTable = function(items, startIdx) {
+        const tbody = document.getElementById('dataTableBody');
+        if (!tbody) return;
+        document.getElementById('rowCountDisplay').innerText = `${filteredList.length} ITEMS FOUND`;
+        
+        tbody.innerHTML = items.map((item, index) => {
+            const displayVol = activeTab === 'all' ? (item.initialVolume || item.volume) : item.volume;
+            const low = parseFloat(item.lowlevel || 0);
+            const vol = parseFloat(displayVol || 0);
+            const isLow = vol <= low && low > 0;
+            const volColorClass = (vol === 0) ? 'bg-slate-200 text-slate-500 border-slate-300' : (isLow ? 'low-level-pulse border-red-400' : 'bg-emerald-50 text-emerald-800 border-emerald-200');
+
+            let actionBtns = '';
+            if (activeTab === 'movement') {
+                if (parseFloat(item.volume) === 0) {
+                    actionBtns = `<button onclick="moveOutOfStock('${item.id}')" class="px-4 py-2 bg-amber-500 text-white text-[10px] font-bold rounded-xl hover:bg-amber-600 uppercase shadow-sm">Out of stock</button>`;
+                } else {
+                    actionBtns = `
+                        <div class="flex justify-end gap-2">
+                            <button onclick="openMovementMode('${item.id}')" class="px-4 py-2 bg-indigo-700 text-white text-[10px] font-bold rounded-xl hover:bg-indigo-800 uppercase shadow-sm">บันทึกการใช้</button>
+                        </div>
+                    `;
+                }
+            } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') {
+                actionBtns = ''; // Remove Undo button as per instruction
+            } else if (activeTab !== 'all' && activeTab !== 'export') {
+                actionBtns = `
+                    <div class="flex justify-end gap-1">
+                        <button onclick="copyItem('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">📋</button>
+                        <button onclick="openEditMode('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">✏️</button>
+                        <button onclick="openDeleteModal('${item.id}', '${item.primername}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">🗑️</button>
+                    </div>
+                `;
+            }
+
+            let boxSlotDisplay = (item.box && item.slot) ? (item.box + '/' + item.slot) : (item.isoutofstock ? (item.prevbox + '/' + item.prevslot) : '-');
+            let boxSlotStyle = (item.box && item.slot) ? 'text-cyan-800 bg-cyan-100 border-cyan-200' : 'text-slate-400 bg-slate-100 border-slate-200 italic';
+
+            let displayID = item.id;
+            if (displayID.length > 6 && isNaN(displayID)) {
+                displayID = displayID.substring(0,6) + "...";
+            }
+
+            return `
+            <tr class="custom-table-row transition-all border-b border-slate-200 cursor-pointer" onclick="showDetails('${item.id}')">
+                <td class="px-6 py-4 text-center text-slate-900 font-bold text-[11px]">${startIdx + index + 1}</td>
+                <td class="px-6 py-4 text-slate-900 text-center font-bold whitespace-nowrap text-[11px]">${formatDateOnly(item.orderdate)}</td>
+                <td class="px-6 py-4 text-slate-500 text-center font-mono text-[10px]">${displayID}</td>
+                <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full bg-slate-200 text-slate-900 text-[10px] font-bold uppercase">${item.animaltype || '-'}</span></td>
+                <td class="px-6 py-4 text-slate-900 font-bold text-center">${item.species || '-'}</td>
+                <td class="px-6 py-4 text-slate-900 font-bold leading-tight">${item.primername || '-'}</td>
+                <td class="px-6 py-4 text-center whitespace-nowrap"><span class="font-bold px-3 py-1 rounded-lg border text-[11px] ${boxSlotStyle}">${boxSlotDisplay}</span></td>
+                <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-lg border text-xs font-bold ${volColorClass}">${displayVol || 0}</span></td>
+                ${(activeTab !== 'all' && activeTab !== 'export') ? `<td class="px-6 py-4 text-right" onclick="event.stopPropagation();">${actionBtns}</td>` : ''}
+            </tr>`;
+        }).join('');
+    };
+
+    window.filterTable = function() {
+        const q = document.getElementById('searchMain').value.toLowerCase();
+        const dFrom = document.getElementById('filterDateFrom').value;
+        const dTo = document.getElementById('filterDateTo').value;
+        const fA = document.getElementById('filterAnimal').value;
+        const fS = document.getElementById('filterSpecies').value;
+        const fM = document.getElementById('filterMethod').value;
+        const fB = document.getElementById('filterBox').value;
+        const fStat = document.getElementById('filterStatus').value;
+        
+        filteredList = dataList.filter(item => {
+            if (activeTab === 'all' || activeTab === 'export') {
+                if (fStat === 'in' && item.isoutofstock) return false;
+                if (fStat === 'out' && !item.isoutofstock) return false;
+            } else if (activeTab === 'stock') {
+                if (activeStockSub === 'out-of-stock') { if (!item.isoutofstock) return false; }
+                else {
+                    if (item.isoutofstock) return false;
+                    const typeMatch = (activeStockSub === 'stock-probe') ? item.itemtype === 'PROBE' : item.itemtype === 'PRIMER';
+                    if (!typeMatch) return false;
+                }
+            } else if (activeTab === 'movement') { if (item.isoutofstock) return false; }
+
+            const dateMatch = (!dFrom || new Date(item.orderdate) >= new Date(dFrom)) && (!dTo || new Date(item.orderdate) <= new Date(dTo));
+            const global = Object.values(item).some(v => String(v).toLowerCase().includes(q));
+            const animal = !fA || item.animaltype === fA;
+            const species = !fS || item.species === fS;
+            const method = !fM || item.method === fM;
+            const box = !fB || item.box === fB;
+            return dateMatch && global && animal && species && method && box;
+        });
+        
+        filteredList.sort((a, b) => new Date(b.orderdate) - new Date(a.orderdate));
+        currentPage = 1; displayCurrentPage();
+    };
+
+    window.switchTab = function(t) {
+        activeTab = t;
+        ['all', 'stock', 'movement', 'storage', 'export', 'history'].forEach(id => {
+            const btn = document.getElementById('tab-' + id);
+            if(btn) btn.className = `flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${t === id ? 'tab-active shadow-inner' : 'text-slate-900'}`;
+        });
+        document.getElementById('th-actions').style.display = (t === 'all' || t === 'export') ? 'none' : 'table-cell';
+        const viewMapping = { 'all': 'list', 'stock': 'list', 'movement': 'list', 'storage': 'storage', 'export': 'list', 'history': 'history' };
+        ['list', 'storage', 'history'].forEach(vid => { document.getElementById('view-' + vid).classList.toggle('hidden', viewMapping[t] !== vid); });
+        document.getElementById('stock-sub-tabs').classList.toggle('hidden', t !== 'stock');
+        document.getElementById('btn-export-excel').classList.toggle('hidden', t !== 'export');
+        if (t === 'stock') switchStockSub(activeStockSub);
+        filterTable();
+        if (t === 'storage') renderBoxMap();
+        if (t === 'history') renderHistory(true);
+    };
+
+    window.switchStockSub = function(sub) {
+        activeStockSub = sub;
+        ['stock-primer', 'stock-probe', 'out-of-stock'].forEach(id => {
+            const btn = document.getElementById('sub-tab-' + id);
+            if(btn) btn.className = `px-8 py-2 rounded-xl text-[10px] font-bold border transition-all ${sub === id ? 'sub-tab-active' : 'bg-white'}`;
+        });
+        filterTable();
+    };
+
+    window.moveOutOfStock = async function(id) {
+        const item = dataList.find(d => d.id === id); if (!item) return;
+        try {
+            await updateDoc(doc(db, COLLECTION_NAME, id), {
+                prevbox: item.box,
+                prevslot: item.slot,
+                box: "",
+                slot: "",
+                isoutofstock: true
+            });
+            saveHistoryLog("Moved Out of Stock", item.primername, [`Storage: ${item.box}/${item.slot} -> Out of stock`]);
+            showToast("ย้ายรายการไปที่ 'Out of stock' เรียบร้อย", "success");
+        } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
+    };
+
+    window.undoOutOfStock = async function(id) {
+        const item = dataList.find(d => d.id === id); if (!item) return;
+        try {
+            await updateDoc(doc(db, COLLECTION_NAME, id), {
+                box: item.prevbox,
+                slot: item.prevslot,
+                isoutofstock: false
+            });
+            saveHistoryLog("Restored Stock", item.primername, [`Out of stock -> Storage: ${item.prevbox}/${item.prevslot}`]);
+            showToast("คืนค่ารายการเรียบร้อย", "success");
+        } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
+    };
+
+    window.toggleForm = function(type = null) { 
+        const f = document.getElementById('data-form'); if (!f) return;
+        if (type === null) { f.classList.add('hidden'); return; }
+        isEditMode = false; isMovementMode = false; currentFormType = type;
+        document.getElementById('labForm').reset(); document.getElementById('editingId').value = ""; document.getElementById('field_itemType').value = type;
+        document.getElementById('movement_extra').classList.add('hidden');
+        document.getElementById('form_box').classList.remove('input-error');
+        document.getElementById('btn_add_slot').classList.remove('hidden');
+        ['box_error','slot_conflict_error'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        resetSlotFields(); updateFormUI(type);
+        document.getElementById('formTitle').innerText = "+ " + type; 
+        setFieldsStatus(false); f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.updateFormUI = function(type) {
+        const ln = document.getElementById('label_name');
+        const gp = document.getElementById('group_primer');
+        const go = document.getElementById('group_probe');
+        if (type === 'PRIMER') { ln.innerText = "Primer Name"; go.classList.add('hidden'); gp.classList.remove('hidden'); }
+        else { ln.innerText = "Probe Name"; gp.classList.add('hidden'); go.classList.remove('hidden'); }
+        updateBP('field_forward', 'fwd_counter'); 
+        updateBP('field_reverse', 'rev_counter');
+        updateBP('field_probe', 'probe_counter');
+    };
+
+    window.updateBP = function(id, counterId) {
+        const val = document.getElementById(id).value.trim();
+        const counterEl = document.getElementById(counterId);
+        if (counterEl) {
+            counterEl.innerText = val.length + " bp.";
+        }
+    };
+
+    window.addSlotField = function(val = "") {
+        const container = document.getElementById('slotInputContainer');
+        const div = document.createElement('div'); 
+        div.className = "flex gap-1 animate-in slide-in-from-right-2";
+        let btnHtml = "";
+        if (!isMovementMode) {
+            btnHtml = '<button type="button" onclick="this.parentElement.remove()" class="p-3 text-red-500 font-bold">✕</button>';
+        }
+        div.innerHTML = `
+            <input type="text" name="slot" value="${val}" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" ${isMovementMode ? 'readonly' : ''}>
+            <button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl ${isMovementMode ? 'hidden' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+            </button>
+            ${btnHtml}
+        `;
+        container.appendChild(div);
+    };
+
+    window.resetSlotFields = function(slots = [""]) {
+        const container = document.getElementById('slotInputContainer'); 
+        container.innerHTML = "";
+        slots.forEach((s, idx) => {
+            const div = document.createElement('div'); div.className = "flex gap-1";
+            let btnHtml = "";
+            if (idx > 0 && !isMovementMode) {
+                btnHtml = '<button type="button" onclick="this.parentElement.remove()" class="p-3 text-red-500 font-bold">✕</button>';
+            }
+            div.innerHTML = `
+                <input type="text" name="slot" value="${s.trim()}" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" readonly>
+                <button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 ${isMovementMode ? 'hidden' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                </button>
+                ${btnHtml}
+            `;
+            container.appendChild(div);
+        });
+    };
+
+    window.setFieldsStatus = function(isMovement) {
+        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_ta', 'field_productSize', 'field_company', 'field_reference', 'field_lowLevel', 'form_box', 'field_volume', 'field_usageCount'];
+        all.forEach(id => {
+            const el = document.getElementById(id); if (!el) return;
+            const isAllowedInMovement = ['field_usedAmount', 'field_usageCount'].includes(id);
+            const isEditable = !isMovement || isAllowedInMovement;
+            el.readOnly = !isEditable; 
+            el.classList.toggle('input-readonly', !isEditable);
+            if (el.tagName === 'SELECT') el.disabled = !isEditable;
+        });
+        document.getElementById('btn_add_slot').classList.toggle('hidden', isMovement);
+    };
+
+    window.calculateRemainingVol = function() {
+        const currentVol = parseFloat(document.getElementById('field_volume').dataset.orig || 0);
+        const used = parseFloat(document.getElementById('field_usedAmount').value || 0);
+        document.getElementById('field_volume').value = Math.max(0, currentVol - used);
+    };
+
+    // --- Helper Function สำหรับสร้าง ID 4 หลัก ---
+    function generateNextID() {
+        if (dataList.length === 0) return "0001";
+        const numericIds = dataList.map(i => parseInt(i.id)).filter(n => !isNaN(n));
+        if (numericIds.length === 0) return "0001";
+        const max = Math.max(...numericIds);
+        return String(max + 1).padStart(4, '0');
+    }
+
+    // --- FORM SUBMIT HANDLER FOR FIREBASE ---
+    document.getElementById('labForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const curId = document.getElementById('editingId').value;
+        const curBox = document.getElementById('form_box').value.trim().toUpperCase();
+        const selectedSlots = Array.from(document.querySelectorAll('.slot-input')).map(i => i.value.trim().toUpperCase()).filter(v => v !== "");
+        
+        // เช็ค Slot ซ้ำ (Conflict Check)
+        const conflict = dataList.find(i => {
+            if (i.id === curId || i.isoutofstock || String(i.box).toUpperCase() !== curBox) return false;
+            const itemSlots = String(i.slot).split(',').map(s => s.trim().toUpperCase());
+            return selectedSlots.some(s => itemSlots.includes(s));
+        });
+
+        if (conflict && !isMovementMode) {
+            document.getElementById('slot_conflict_error').classList.remove('hidden');
+            showToast("พิกัดซ้ำ กรุณาตรวจสอบ", "error"); return;
+        }
+
+        const formData = new FormData(this);
+        let newItem = { slot: [] };
+        formData.forEach((v, k) => { 
+            if(k === 'slot') { if(v) newItem.slot.push(v); }
+            else if(k !== 'id') { newItem[k.toLowerCase()] = v; }
+        });
+        
+        newItem.slot = newItem.slot.join(', ');
+        newItem.volume = parseFloat(newItem.volume || 0);
+        newItem.usagecount = parseInt(newItem.usagecount || 0);
+        
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reverse': 'Reverse', 'company': 'Company', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+
+        try {
+            if (curId) {
+                const originalItem = dataList.find(i => i.id === curId);
+                let diffs = [];
+                
+                if (isMovementMode) { 
+                    newItem.usagecount += 1; 
+                    diffs.push(`Used: ${document.getElementById('field_usedAmount').value} ul`);
+                    diffs.push(`Volume: ${originalItem.volume} -> ${newItem.volume}`);
+                    saveHistoryLog("Usage Recorded", newItem.primername, diffs);
+                } else { 
+                    newItem.initialVolume = newItem.volume; 
+                    Object.keys(labelsMap).forEach(key => {
+                        let oldV = String(originalItem[key] || '-');
+                        let newV = String(newItem[key] || '-');
+                        if (oldV !== newV) diffs.push(`${labelsMap[key]}: ${oldV} -> ${newV}`);
+                    });
+                    saveHistoryLog("Detail Updated", newItem.primername, diffs);
+                }
+                
+                await updateDoc(doc(db, COLLECTION_NAME, curId), newItem);
+            } else {
+                newItem.orderdate = newItem.orderdate ? new Date(newItem.orderdate).toISOString() : new Date().toISOString();
+                newItem.initialVolume = newItem.volume;
+                newItem.isoutofstock = false;
+                const customId = generateNextID();
+                newItem.id = customId; 
+                
+                await setDoc(doc(db, COLLECTION_NAME, customId), newItem);
+                saveHistoryLog("Registered New", newItem.primername, [`ID: ${customId}`, "Initial Registration"]);
+            }
+            showToast("บันทึกสำเร็จ", "success"); toggleForm(); 
+        } catch (error) {
+            console.error(error);
+            showToast("บันทึกไม่สำเร็จ: " + error.message, "error");
+        }
+    });
+
+    window.openSlotPicker = function(btn) {
+        activeSlotInput = btn.parentElement.querySelector('.slot-input');
+        const boxInput = document.getElementById('form_box');
+        if(!boxInput.value) { boxInput.classList.add('input-error'); document.getElementById('box_error').classList.remove('hidden'); return; }
+        const occupied = {};
+        dataList.filter(i => !i.isoutofstock && String(i.box).toUpperCase() === boxInput.value.toUpperCase() && i.slot).forEach(i => {
+            if (isEditMode && i.id === document.getElementById('editingId').value) return;
+            i.slot.split(',').forEach(s => occupied[s.trim().toUpperCase()] = true);
+        });
+        const inForm = {};
+        document.querySelectorAll('.slot-input').forEach(i => { if (i.value) inForm[i.value.toUpperCase()] = true; });
+        generateGrid('picker-grid-container', 'selectSlot', occupied, activeSlotInput.value, inForm);
+        document.getElementById('slotPickerModal').classList.remove('hidden'); document.getElementById('slotPickerModal').classList.add('flex');
+    };
+
+    window.selectSlot = function(slot) { if(activeSlotInput) activeSlotInput.value = slot; closeSlotPicker(); };
+    window.closeSlotPicker = function() { document.getElementById('slotPickerModal').classList.add('hidden'); };
+
+    window.openEditMode = function(id) {
+        const item = dataList.find(d => d.id === id); if(!item) return;
+        isEditMode = true; isMovementMode = false; currentFormType = item.itemtype || 'PRIMER';
+        document.getElementById('movement_extra').classList.add('hidden');
+        updateFormUI(currentFormType); populateForm(item); setFieldsStatus(false);
+        document.getElementById('data-form').classList.remove('hidden'); document.getElementById('data-form').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.openMovementMode = function(id) {
+        const item = dataList.find(d => d.id === id); if(!item) return;
+        isEditMode = true; isMovementMode = true; currentFormType = item.itemtype || 'PRIMER';
+        document.getElementById('movement_extra').classList.remove('hidden');
+        document.getElementById('field_usedAmount').value = "";
+        document.getElementById('field_volume').dataset.orig = item.volume;
+        updateFormUI(currentFormType); populateForm(item); setFieldsStatus(true);
+        document.getElementById('data-form').classList.remove('hidden'); document.getElementById('data-form').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.populateForm = function(item) {
+        document.getElementById('editingId').value = item.id;
+        document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalName': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
+        for (const [h, d] of Object.entries(map)) {
+            const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
+            if (el) {
+                let val = item[d] || "";
+                if (h === 'orderDate' && val) try { val = new Date(val).toISOString().split('T')[0]; } catch(e) {}
+                el.value = val;
+            }
+        }
+        resetSlotFields(item.slot ? item.slot.split(',') : [""]);
+        updateBP('field_forward', 'fwd_counter'); 
+        updateBP('field_reverse', 'rev_counter');
+        updateBP('field_probe', 'probe_counter');
+    };
+
+    window.generateGrid = function(cid, cfn, occ = {}, sel = "", inf = {}) {
+        const container = document.getElementById(cid);
+        const rows = ['A','B','C','D','E','F','G','H','I','J'];
+        let html = '<div class="label-cell"></div>';
+        for(let i=1; i<=10; i++) html += `<div class="label-cell text-[10px] font-bold">${i}</div>`;
+        rows.forEach(r => {
+            html += `<div class="label-cell text-[10px] font-bold">${r}</div>`;
+            for(let c=1; c<=10; c++) {
+                const slot = `${r}${c}`;
+                const isOcc = occ[slot]; const isInf = inf[slot]; const isSel = slot === sel;
+                let cls = "cursor-pointer";
+                if (isOcc) cls += " occupied opacity-40";
+                else if (isSel) cls += " selected";
+                else if (isInf) cls += " in-form-selected";
+                else cls += " hover:bg-cyan-50";
+                html += `<div onclick="${cfn}('${slot}')" class="grid-cell ${cls}">${slot}</div>`;
+            }
+        });
+        container.innerHTML = html;
+    };
+
+    window.renderBoxMap = function() {
+        const box = document.getElementById('mapSelectBox').value; if(!box) return;
+        const occ = {}; dataList.filter(i => !i.isoutofstock && String(i.box).toUpperCase() === box.toUpperCase()).forEach(i => {
+            i.slot.split(',').forEach(s => occ[s.trim().toUpperCase()] = i.id);
+        });
+        generateGrid('main-grid-container', 'handleCellClick', occ);
+    };
+
+    window.handleCellClick = function(slot) {
+        const box = document.getElementById('mapSelectBox').value;
+        const item = dataList.find(i => !i.isoutofstock && i.box === box && i.slot.split(',').some(s => s.trim().toUpperCase() === slot.toUpperCase()));
+        document.querySelectorAll('#main-grid-container .grid-cell').forEach(c => c.classList.remove('selected'));
+        const dataP = document.getElementById('slot-data-panel');
+        if(!item) { document.getElementById('slot-no-data').classList.remove('hidden'); dataP.classList.add('hidden'); return; }
+        document.getElementById('slot-no-data').classList.add('hidden'); dataP.classList.remove('hidden');
+        dataP.innerHTML = `<div class="bg-white p-8 rounded-4xl border-2 border-cyan-100 shadow-xl space-y-6 animate-in zoom-in-50"><span class="px-4 py-1 bg-cyan-600 text-white text-[10px] font-bold rounded-full uppercase">${slot}</span><p class="text-2xl font-bold leading-tight">${item.primername}</p><div class="grid grid-cols-2 gap-4 border-t pt-4"><div class="bg-slate-50 p-3 rounded-2xl"><span class="text-[9px] text-slate-400 font-bold block">Vol.</span><span class="font-bold text-emerald-700">${item.volume} ul.</span></div></div><button onclick="showDetails('${item.id}')" class="w-full py-4 bg-slate-900 text-white rounded-2xl text-xs hover:bg-cyan-700">Open Report</button></div>`;
+    };
+
+    window.updateFilterSuggestions = function(items) {
+        const map = { species: 'list_species', disease: 'list_disease', company: 'list_company', box: 'list_box_options' };
+        Object.entries(map).forEach(([k, lid]) => {
+            const list = document.getElementById(lid); if (!list) return;
+            const u = [...new Set(items.map(i => i[k]))].filter(Boolean).sort();
+            list.innerHTML = u.map(val => `<option value="${val}">`).join('');
+        });
+    };
+
+    window.updateBoxOptions = function(items) {
+        const boxes = [...new Set(items.map(i => i.box).filter(Boolean))].sort();
+        const sel = document.getElementById('mapSelectBox');
+        if(sel) { sel.innerHTML = boxes.map(b => `<option value="${b}">${b}</option>`).join('') || '<option value="">- No Boxes -</option>'; }
+    };
+
+    window.formatDateOnly = function(d) { if(!d) return '-'; const date = new Date(d); return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`; };
+    window.formatDateFull = function(d) { if(!d) return '-'; const date = new Date(d); return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; };
+    
+    window.showToast = function(m, t) { 
+        const overlay = document.createElement('div');
+        overlay.className = "fixed inset-0 flex items-center justify-center z-[10000] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300";
+        const el = document.createElement('div');
+        el.className = `${t==='success'?'bg-slate-900':'bg-red-600'} text-white px-10 py-6 rounded-3xl shadow-2xl z-[10001] font-bold text-lg animate-in zoom-in-95 flex flex-col items-center gap-4`;
+        el.innerHTML = `
+            <div class="text-center">${m}</div>
+            <button class="bg-white/20 hover:bg-white/30 px-6 py-2 rounded-xl text-xs uppercase tracking-widest">ตกลง</button>
+        `;
+        overlay.appendChild(el);
+        document.body.appendChild(overlay);
+        el.querySelector('button').onclick = () => overlay.remove();
+        setTimeout(() => { if (document.body.contains(overlay)) overlay.remove(); }, 3000);
+    };
+
+    window.displayCurrentPage = function() { const s = (currentPage - 1) * rowsPerPage; renderTable(filteredList.slice(s, s + rowsPerPage), s); updatePaginationUI(); };
+    window.updatePaginationUI = function() { const total = Math.ceil(filteredList.length / rowsPerPage) || 1; document.getElementById('currentPageDisplay').innerText = currentPage; document.getElementById('totalPagesDisplay').innerText = total; document.getElementById('prevPageBtn').disabled = (currentPage === 1); document.getElementById('nextPageBtn').disabled = (currentPage === total); };
+    window.prevPage = function() { if(currentPage > 1) { currentPage--; displayCurrentPage(); } };
+    window.nextPage = function() { if(currentPage < Math.ceil(filteredList.length / rowsPerPage)) { currentPage++; displayCurrentPage(); } };
+    window.changeRowsPerPage = function() { rowsPerPage = parseInt(document.getElementById('rowsPerPageSelect').value); currentPage = 1; displayCurrentPage(); };
+    
+    window.showDetails = function(id) {
+        const item = dataList.find(d => d.id === id); if(!item) return;
+        const labels = { id: 'ID', orderdate: 'วันที่สั่ง', itemtype: 'ประเภท', animaltype: 'สัตว์', species: 'สายพันธุ์', disease: 'โรค', primername: 'ชื่อ', initialVolume: 'ปริมาณตั้งต้น', volume: 'ปริมาณปัจจุบัน', usagecount: 'จำนวนครั้งที่ใช้', targetgene: 'ยีน', method: 'เทคนิค', forward: 'Forward', reverse: 'Reverse', company: 'บริษัท', ta: 'TA', productsize: 'Size', box: 'Box', slot: 'Slot', reference: 'หมายเหตุ' };
+        document.getElementById('modalPrimerName').innerText = "Detail Report: " + item.primername;
+        document.getElementById('modalContent').innerHTML = Object.entries(labels).map(([k, lbl]) => `<div class="p-4 bg-white rounded-2xl border"><span class="text-[9px] font-bold text-cyan-800 uppercase">${lbl}</span><span class="block text-sm font-bold">${(k==='orderdate')?formatDateFull(item[k]):(item[k]||'-')}</span></div>`).join('');
+        document.getElementById('detailModal').classList.remove('hidden'); document.getElementById('detailModal').classList.add('flex');
+    };
+
+    window.closeModal = function() { document.getElementById('detailModal').classList.add('hidden'); };
+    
+    window.openDeleteModal = function(id, name) { 
+        document.getElementById('deleteItemName').innerText = name; 
+        document.getElementById('deleteModal').classList.remove('hidden'); document.getElementById('deleteModal').classList.add('flex'); 
+        document.getElementById('confirmDeleteBtn').onclick = async () => { 
+            try {
+                await deleteDoc(doc(db, COLLECTION_NAME, id));
+                saveHistoryLog("Deleted Record", name); 
+                document.getElementById('deleteModal').classList.add('hidden');
+                showToast("ลบข้อมูลสำเร็จ", "success");
+            } catch(e) { console.error(e); showToast("ลบไม่สำเร็จ", "error"); }
+        }; 
+    };
+    
+    window.closeDeleteModal = function() { document.getElementById('deleteModal').classList.add('hidden'); };
+    
+    window.copyItem = async function(id) { 
+        const original = dataList.find(d => d.id === id); if(!original) return; 
+        try {
+            const newItem = { ...original };
+            delete newItem.id; 
+            newItem.primername += " (Copy)";
+            const customId = generateNextID();
+            newItem.id = customId;
+            await setDoc(doc(db, COLLECTION_NAME, customId), newItem);
+            showToast("คัดลอกร่างข้อมูลแล้ว", "success");
+        } catch(e) { console.error(e); showToast("คัดลอกไม่สำเร็จ", "error"); }
+    };
+    
+    window.exportToExcel = function() {
+        const ws = XLSX.utils.json_to_sheet(filteredList);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "LabData");
+        XLSX.writeFile(wb, "LabData_Export.xlsx");
+    };
+
+    // Initialize
+    switchTab('all');
+
+</script>
+</body>
+</html>
