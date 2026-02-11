@@ -47,7 +47,7 @@
             width: 100%;
             max-width: 400px;
             border-radius: 2.5rem;
-            padding: 3rem 2.5rem;
+            padding: 3.5rem 2.5rem;
             box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
@@ -85,8 +85,8 @@
         }
         .login-input:focus { 
             background-color: #ffffff; 
-            border-color: #14b8a6; 
-            box-shadow: 0 4px 12px -2px rgba(20, 184, 166, 0.2); 
+            border-color: #2dd4bf; 
+            box-shadow: 0 4px 12px -2px rgba(45, 212, 191, 0.2); 
         }
         
         .login-btn {
@@ -150,7 +150,7 @@
             </svg>
         </div>
 
-        <h2 class="text-3xl font-bold text-slate-800 mb-2">ยินดีต้อนรับ</h2>
+        <h2 class="text-3xl font-bold text-slate-800 mb-2">NEXUS BIO</h2>
         <p class="text-slate-500 font-medium mb-10 text-sm">Lab Data Management System</p>
 
         <form id="loginForm">
@@ -211,7 +211,7 @@
             <button onclick="switchTab('all')" id="tab-all" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">รายการทั้งหมด</button>
             <button onclick="switchTab('stock')" id="tab-stock" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">จัดการสต๊อก</button>
             <button onclick="switchTab('movement')" id="tab-movement" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">บันทึกการใช้งาน</button>
-            <button onclick="switchTab('storage')" id="tab-storage" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">แผนผัง (Box Map)</button>
+            <button onclick="switchTab('storage')" id="tab-storage" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">กล่องเก็บ (Box Map)</button>
             <button onclick="switchTab('export')" id="tab-export" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">ส่งออกข้อมูล</button>
             <button onclick="switchTab('history')" id="tab-history" class="flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold text-slate-900 transition-all flex items-center justify-center gap-2">ประวัติรายการ</button>
         </div>
@@ -245,7 +245,7 @@
                     <div class="space-y-6">
                         <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">รายละเอียด</h3>
                         <div><label id="label_name" class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Name</label><input type="text" name="primerName" id="field_primerName" required class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold border outline-none"></div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Original Name</label><input type="text" name="originalName" id="field_originalName" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Primer Original Name</label><input type="text" name="originalName" id="field_originalName" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         <div class="grid grid-cols-2 gap-3">
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">TA (°C)</label><input type="text" name="ta" id="field_ta" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Size (bp)</label><input type="text" name="productSize" id="field_productSize" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
@@ -258,7 +258,7 @@
                         <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Method</label><select name="method" id="field_method" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="PCR">PCR</option><option value="RT-PCR">RT-PCR</option><option value="qPCR">qPCR</option><option value="RT-qPCR">RT-qPCR</option><option value="ddPCR">ddPCR</option></select></div>
                         <div id="group_primer" class="grid grid-cols-2 gap-3">
                             <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Forward <span id="fwd_counter" class="bp-badge">0 bp.</span></label><input type="text" name="forward" id="field_forward" oninput="updateBP('field_forward', 'fwd_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
-                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reverse <span id="rev_counter" class="bp-badge">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" oninput="updateBP('field_reverse', 'rev_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reward <span id="rev_counter" class="bp-badge">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" oninput="updateBP('field_reverse', 'rev_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
                         </div>
                     </div>
 
@@ -271,7 +271,7 @@
                             <span id="slot_conflict_error" class="error-text hidden">ตำแหน่ง Slot นี้ถูกใช้งานแล้ว โปรดเปลี่ยนตำแหน่งใหม่</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Volume (ul)</label><input type="number" name="volume" id="field_volume" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-emerald-700 border outline-none"></div>
+                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Volume (ul.)</label><input type="number" name="volume" id="field_volume" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-emerald-700 border outline-none"></div>
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Low Level</label><input type="number" name="lowLevel" id="field_lowLevel" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-red-600 border outline-none"></div>
                         </div>
                         <div id="movement_extra" class="hidden animate-in slide-in-from-top-2 duration-300">
@@ -325,9 +325,9 @@
                                 <th class="px-6 py-5 text-center w-12">No.</th>
                                 <th class="px-6 py-5 text-center">Date</th>
                                 <th class="px-6 py-5 text-center">ID</th>
-                                <th class="px-6 py-5 text-center">Animal</th>
+                                <th class="px-6 py-5 text-center">Animal Type</th>
                                 <th class="px-6 py-5 text-center">Species</th>
-                                <th class="px-6 py-5">Name</th>
+                                <th class="px-6 py-5 text-center">Name</th>
                                 <th class="px-6 py-5 text-center">Box/Slot</th>
                                 <th class="px-6 py-5 text-center">Vol. (ul)</th>
                                 <th id="th-actions" class="px-6 py-5 text-right">Actions</th>
@@ -397,6 +397,7 @@
             </div>
         </div>
 
+        <!-- Modal: บังคับเปลี่ยนรหัสผ่านครั้งแรก (ย้ายมาไว้ข้างใน Container เพื่อให้ Tailwind ทำงาน) -->
         <div id="forcePasswordModal" class="fixed inset-0 z-[10000] hidden items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-xl"></div>
             <div class="relative bg-white w-full max-w-md rounded-[40px] p-10 shadow-2xl animate-in zoom-in-95">
@@ -475,7 +476,7 @@
     const auth = getAuth(app); 
     const COLLECTION_NAME = "lab_items"; 
     const LOGS_COLLECTION = "activity_logs"; 
-    const USERS_COLLECTION = "users";
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
     // --- USER MANAGEMENT ---
     const USER_MAPPING = {
@@ -490,19 +491,17 @@
     // --- AUTH LOGIC ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // FIX: แก้ไข Path ให้ตรงกับคอลเลกชัน 'users' ที่สร้างไว้ใน Firebase
-            const userDocRef = doc(db, USERS_COLLECTION, user.email);
-            const userSnap = await getDoc(userDocRef);
-            const userData = userSnap.data();
+            // ตรวจสอบจาก Firebase คอลเลกชัน 'users' ว่าเคยเปลี่ยนรหัสหรือยัง
+            const userSettingsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'users', 'status');
+            const userSnap = await getDoc(userSettingsRef);
             
-            if (!userSnap.exists() || userData.mustChangePassword !== false) {
-                // บังคับเปลี่ยนรหัสผ่าน
+            if (!userSnap.exists() || !userSnap.data().passwordChanged) {
+                // บังคับเปลี่ยนรหัสผ่าน: ต้องปลดล็อค Container หลักก่อนเพราะ Modal อยู่ข้างใน และ Modal ถูกคุมโดย important config
                 document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
                 document.getElementById('forcePasswordModal').classList.remove('hidden');
                 document.getElementById('forcePasswordModal').classList.add('flex');
                 document.getElementById('login-overlay').classList.add('hidden-important');
             } else {
-                // ล็อกอินผ่าน -> เข้าสู่โปรแกรม
                 document.getElementById('forcePasswordModal').classList.add('hidden');
                 document.getElementById('login-overlay').classList.add('hidden-important');
                 document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
@@ -536,10 +535,9 @@
         try {
             await updatePassword(auth.currentUser, newPass);
             
-            // FIX: บันทึกสถานะว่าเปลี่ยนรหัสผ่านแล้วลงในคอลเลกชัน 'users' ของคุณ
-            await setDoc(doc(db, USERS_COLLECTION, auth.currentUser.email), { 
-                mustChangePassword: false, 
-                email: auth.currentUser.email,
+            const userSettingsRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'users', 'status');
+            await setDoc(userSettingsRef, { 
+                passwordChanged: true, 
                 updatedAt: new Date().toISOString() 
             }, { merge: true });
             
@@ -550,7 +548,7 @@
             
         } catch (error) {
             console.error(error);
-            errorEl.innerText = "เกิดข้อผิดพลาด: " + error.message;
+            errorEl.innerText = "เกิดข้อผิดพลาด: " + (error.code === 'auth/requires-recent-login' ? "กรุณาเข้าสู่ระบบใหม่อีกครั้งก่อนเปลี่ยนรหัส" : error.message);
             errorEl.classList.remove('hidden');
         }
     });
@@ -703,7 +701,7 @@
                     `;
                 }
             } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') {
-                actionBtns = `<button onclick="undoOutOfStock('${item.id}')" class="px-5 py-2 bg-slate-800 text-white text-[10px] font-bold rounded-xl hover:bg-slate-900 shadow-md uppercase tracking-wider">คืนค่า (Undo)</button>`;
+                actionBtns = ''; 
             } else if (activeTab !== 'all' && activeTab !== 'export') {
                 actionBtns = `
                     <div class="flex justify-end gap-1">
@@ -729,7 +727,7 @@
                 <td class="px-6 py-4 text-slate-500 text-center font-mono text-[10px]">${displayID}</td>
                 <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full bg-slate-200 text-slate-900 text-[10px] font-bold uppercase">${item.animaltype || '-'}</span></td>
                 <td class="px-6 py-4 text-slate-900 font-bold text-center">${item.species || '-'}</td>
-                <td class="px-6 py-4 text-slate-900 font-bold leading-tight">${item.primername || '-'}</td>
+                <td class="px-6 py-4 text-center text-slate-900 font-bold leading-tight">${item.primername || '-'}</td>
                 <td class="px-6 py-4 text-center whitespace-nowrap"><span class="font-bold px-3 py-1 rounded-lg border text-[11px] ${boxSlotStyle}">${boxSlotDisplay}</span></td>
                 <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-lg border text-xs font-bold ${volColorClass}">${displayVol || 0}</span></td>
                 ${(activeTab !== 'all' && activeTab !== 'export') ? `<td class="px-6 py-4 text-right" onclick="event.stopPropagation();">${actionBtns}</td>` : ''}
@@ -765,7 +763,7 @@
             const animal = !fA || item.animaltype === fA;
             const species = !fS || item.species === fS;
             const method = !fM || item.method === fM;
-            const box = !fB || item.box === fB;
+            const box = !fM || item.box === fB;
             return dateMatch && global && animal && species && method && box;
         });
         
@@ -916,6 +914,14 @@
         const used = parseFloat(document.getElementById('field_usedAmount').value || 0);
         document.getElementById('field_volume').value = Math.max(0, currentVol - used);
     };
+
+    function generateNextID() {
+        if (dataList.length === 0) return "0001";
+        const numericIds = dataList.map(i => parseInt(i.id)).filter(n => !isNaN(n));
+        if (numericIds.length === 0) return "0001";
+        const max = Math.max(...numericIds);
+        return String(max + 1).padStart(4, '0');
+    }
 
     document.getElementById('labForm').addEventListener('submit', async function(e) {
         e.preventDefault();
