@@ -47,7 +47,7 @@
             width: 100%;
             max-width: 400px;
             border-radius: 2.5rem;
-            padding: 3.5rem 2.5rem;
+            padding: 3rem 2.5rem;
             box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
@@ -85,8 +85,8 @@
         }
         .login-input:focus { 
             background-color: #ffffff; 
-            border-color: #2dd4bf; 
-            box-shadow: 0 4px 12px -2px rgba(45, 212, 191, 0.2); 
+            border-color: #14b8a6; 
+            box-shadow: 0 4px 12px -2px rgba(20, 184, 166, 0.2); 
         }
         
         .login-btn {
@@ -145,6 +145,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/>
                 <path d="M8.5 2h7"/>
+                <path d="M7 16h10"/>
                 <path d="M7 16h10"/>
             </svg>
         </div>
@@ -395,34 +396,52 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="slotPickerModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSlotPicker()"></div>
-        <div class="relative bg-white w-full max-w-xl rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95">
-            <div class="flex justify-between items-center mb-8"><h3 class="text-lg font-bold uppercase tracking-widest">Select Coordinate</h3><button onclick="closeSlotPicker()" class="p-2 hover:text-red-500 font-bold text-xl">✕</button></div>
-            <div class="bg-slate-100 p-6 rounded-[32px] border-2 border-slate-200 shadow-inner overflow-x-auto">
-                <div class="grid-container" id="picker-grid-container"></div>
+        <div id="forcePasswordModal" class="fixed inset-0 z-[10000] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-xl"></div>
+            <div class="relative bg-white w-full max-w-md rounded-[40px] p-10 shadow-2xl animate-in zoom-in-95">
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">เปลี่ยนรหัสผ่านใหม่</h3>
+                <p class="text-slate-500 text-sm mb-8">เนื่องจากเป็นการเข้าสู่ระบบครั้งแรก กรุณาตั้งรหัสผ่านใหม่เพื่อความปลอดภัยของระบบ</p>
+                <form id="forcePasswordForm" class="space-y-4">
+                    <div class="login-input-group">
+                        <input type="password" id="newPassword" class="login-input" style="padding-left: 1.5rem;" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" required minlength="6">
+                    </div>
+                    <div class="login-input-group">
+                        <input type="password" id="confirmNewPassword" class="login-input" style="padding-left: 1.5rem;" placeholder="ยืนยันรหัสผ่านใหม่" required minlength="6">
+                    </div>
+                    <button type="submit" class="login-btn">บันทึกและเริ่มต้นใช้งาน</button>
+                </form>
+                <p id="passwordError" class="text-red-500 text-xs font-bold mt-4 hidden bg-red-50 p-2 rounded-lg border border-red-100"></p>
             </div>
-            <div class="mt-8 flex justify-between items-center text-[10px] font-bold uppercase"><span>* BLUE = OCCUPIED / BORDERED = IN-FORM</span><button onclick="closeSlotPicker()" class="px-10 py-3 bg-slate-900 text-white rounded-2xl uppercase shadow-lg">Confirm</button></div>
         </div>
-    </div>
 
-    <div id="detailModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-[40px] flex flex-col shadow-2xl animate-in zoom-in-95">
-            <div class="flex justify-between items-center p-8 border-b bg-slate-50/50"><h2 id="modalPrimerName" class="font-bold text-2xl text-brand-700 tracking-tight leading-tight uppercase">รายละเอียดข้อมูล</h2><button onclick="closeModal()" class="text-slate-900 hover:text-red-500 text-2xl">✕</button></div>
-            <div id="modalContent" class="overflow-y-auto p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm custom-scrollbar"></div>
-            <div class="p-8 border-t bg-slate-50/50 flex justify-end"><button onclick="closeModal()" class="px-12 py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-md active:scale-95 transition-all">Close Report</button></div>
+        <div id="slotPickerModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSlotPicker()"></div>
+            <div class="relative bg-white w-full max-w-xl rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95">
+                <div class="flex justify-between items-center mb-8"><h3 class="text-lg font-bold uppercase tracking-widest">Select Coordinate</h3><button onclick="closeSlotPicker()" class="p-2 hover:text-red-500 font-bold text-xl">✕</button></div>
+                <div class="bg-slate-100 p-6 rounded-[32px] border-2 border-slate-200 shadow-inner overflow-x-auto">
+                    <div class="grid-container" id="picker-grid-container"></div>
+                </div>
+                <div class="mt-8 flex justify-between items-center text-[10px] font-bold uppercase"><span>* BLUE = OCCUPIED / BORDERED = IN-FORM</span><button onclick="closeSlotPicker()" class="px-10 py-3 bg-slate-900 text-white rounded-2xl uppercase shadow-lg">Confirm</button></div>
+            </div>
         </div>
-    </div>
 
-    <div id="deleteModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-        <div class="relative bg-white w-full max-w-sm rounded-[32px] p-10 text-center shadow-2xl animate-in slide-in-from-bottom-4">
-            <h3 class="font-bold text-xl mb-4 uppercase">Confirm Delete?</h3>
-            <p id="deleteItemName" class="text-sm text-slate-500 mb-10 font-bold italic"></p>
-            <div class="flex gap-4"><button onclick="closeDeleteModal()" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold uppercase border">No</button><button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-lg uppercase">Yes, Delete</button></div>
+        <div id="detailModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
+            <div class="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-[40px] flex flex-col shadow-2xl animate-in zoom-in-95">
+                <div class="flex justify-between items-center p-8 border-b bg-slate-50/50"><h2 id="modalPrimerName" class="font-bold text-2xl text-brand-700 tracking-tight leading-tight uppercase">รายละเอียดข้อมูล</h2><button onclick="closeModal()" class="text-slate-900 hover:text-red-500 text-2xl">✕</button></div>
+                <div id="modalContent" class="overflow-y-auto p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm custom-scrollbar"></div>
+                <div class="p-8 border-t bg-slate-50/50 flex justify-end"><button onclick="closeModal()" class="px-12 py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-md active:scale-95 transition-all">Close Report</button></div>
+            </div>
+        </div>
+
+        <div id="deleteModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+            <div class="relative bg-white w-full max-w-sm rounded-[32px] p-10 text-center shadow-2xl animate-in slide-in-from-bottom-4">
+                <h3 class="font-bold text-xl mb-4 uppercase">Confirm Delete?</h3>
+                <p id="deleteItemName" class="text-sm text-slate-500 mb-10 font-bold italic"></p>
+                <div class="flex gap-4"><button onclick="closeDeleteModal()" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold uppercase border">No</button><button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-lg uppercase">Yes, Delete</button></div>
+            </div>
         </div>
     </div>
 
@@ -436,8 +455,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-    import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // --- CONFIGURATION ---
     const firebaseConfig = {
@@ -456,6 +475,7 @@
     const auth = getAuth(app); 
     const COLLECTION_NAME = "lab_items"; 
     const LOGS_COLLECTION = "activity_logs"; 
+    const USERS_COLLECTION = "users";
 
     // --- USER MANAGEMENT ---
     const USER_MAPPING = {
@@ -468,19 +488,70 @@
     }
 
     // --- AUTH LOGIC ---
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById('login-overlay').classList.add('hidden-important');
-            document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
+            // FIX: แก้ไข Path ให้ตรงกับคอลเลกชัน 'users' ที่สร้างไว้ใน Firebase
+            const userDocRef = doc(db, USERS_COLLECTION, user.email);
+            const userSnap = await getDoc(userDocRef);
+            const userData = userSnap.data();
             
-            const displayName = getUserName(user.email);
-            document.getElementById('userNameDisplay').innerText = displayName;
-            
-            fetchData(); 
-            showToast(`ยินดีต้อนรับคุณ ${displayName} เข้าสู่ระบบ`, "success");
+            if (!userSnap.exists() || userData.mustChangePassword !== false) {
+                // บังคับเปลี่ยนรหัสผ่าน
+                document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
+                document.getElementById('forcePasswordModal').classList.remove('hidden');
+                document.getElementById('forcePasswordModal').classList.add('flex');
+                document.getElementById('login-overlay').classList.add('hidden-important');
+            } else {
+                // ล็อกอินผ่าน -> เข้าสู่โปรแกรม
+                document.getElementById('forcePasswordModal').classList.add('hidden');
+                document.getElementById('login-overlay').classList.add('hidden-important');
+                document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
+                
+                const displayName = getUserName(user.email);
+                document.getElementById('userNameDisplay').innerText = displayName;
+                
+                fetchData(); 
+                showToast(`ยินดีต้อนรับคุณ ${displayName} เข้าสู่ระบบ`, "success");
+            }
         } else {
             document.getElementById('login-overlay').classList.remove('hidden-important');
             document.getElementById('wp-lab-app-container').classList.add('hidden-important');
+            document.getElementById('forcePasswordModal').classList.add('hidden');
+        }
+    });
+
+    // ฟังชั่นเปลี่ยนรหัสผ่านครั้งแรก
+    document.getElementById('forcePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmNewPassword').value;
+        const errorEl = document.getElementById('passwordError');
+        
+        if (newPass !== confirmPass) {
+            errorEl.innerText = "รหัสผ่านไม่ตรงกัน";
+            errorEl.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            await updatePassword(auth.currentUser, newPass);
+            
+            // FIX: บันทึกสถานะว่าเปลี่ยนรหัสผ่านแล้วลงในคอลเลกชัน 'users' ของคุณ
+            await setDoc(doc(db, USERS_COLLECTION, auth.currentUser.email), { 
+                mustChangePassword: false, 
+                email: auth.currentUser.email,
+                updatedAt: new Date().toISOString() 
+            }, { merge: true });
+            
+            showToast("เปลี่ยนรหัสผ่านสำเร็จแล้ว", "success");
+            saveHistoryLog("Initial Password Changed", "User Security", ["Password updated on first login"]);
+            
+            window.location.reload();
+            
+        } catch (error) {
+            console.error(error);
+            errorEl.innerText = "เกิดข้อผิดพลาด: " + error.message;
+            errorEl.classList.remove('hidden');
         }
     });
 
@@ -632,7 +703,7 @@
                     `;
                 }
             } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') {
-                actionBtns = ''; // Remove Undo button as per instruction
+                actionBtns = `<button onclick="undoOutOfStock('${item.id}')" class="px-5 py-2 bg-slate-800 text-white text-[10px] font-bold rounded-xl hover:bg-slate-900 shadow-md uppercase tracking-wider">คืนค่า (Undo)</button>`;
             } else if (activeTab !== 'all' && activeTab !== 'export') {
                 actionBtns = `
                     <div class="flex justify-end gap-1">
@@ -846,23 +917,12 @@
         document.getElementById('field_volume').value = Math.max(0, currentVol - used);
     };
 
-    // --- Helper Function สำหรับสร้าง ID 4 หลัก ---
-    function generateNextID() {
-        if (dataList.length === 0) return "0001";
-        const numericIds = dataList.map(i => parseInt(i.id)).filter(n => !isNaN(n));
-        if (numericIds.length === 0) return "0001";
-        const max = Math.max(...numericIds);
-        return String(max + 1).padStart(4, '0');
-    }
-
-    // --- FORM SUBMIT HANDLER FOR FIREBASE ---
     document.getElementById('labForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const curId = document.getElementById('editingId').value;
         const curBox = document.getElementById('form_box').value.trim().toUpperCase();
         const selectedSlots = Array.from(document.querySelectorAll('.slot-input')).map(i => i.value.trim().toUpperCase()).filter(v => v !== "");
         
-        // เช็ค Slot ซ้ำ (Conflict Check)
         const conflict = dataList.find(i => {
             if (i.id === curId || i.isoutofstock || String(i.box).toUpperCase() !== curBox) return false;
             const itemSlots = String(i.slot).split(',').map(s => s.trim().toUpperCase());
@@ -964,7 +1024,7 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalName': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
         for (const [h, d] of Object.entries(map)) {
             const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
@@ -1102,7 +1162,6 @@
         XLSX.writeFile(wb, "LabData_Export.xlsx");
     };
 
-    // Initialize
     switchTab('all');
 
 </script>
