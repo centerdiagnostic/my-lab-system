@@ -34,7 +34,7 @@
     <style>
         body { background-color: #0f766e; margin: 0; font-family: 'Prompt', sans-serif; }
         
-        /* --- Login & Modal Pure CSS (Fixing the layout issue) --- */
+        /* --- Login & Modal Pure CSS --- */
         #login-overlay { 
             position: fixed; inset: 0; z-index: 9999;
             background-color: #f1f5f9;
@@ -90,7 +90,7 @@
         .brand-footer { margin-top: auto; padding-top: 4rem; display: none; }
         @media (min-width: 768px) { .brand-footer { display: block; } }
         .brand-footer-text { font-size: 0.65rem; color: rgba(153, 246, 228, 0.8); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700; margin: 0; }
-        .brand-footer-line { width: 3rem; height: 4px; background-color: #2dd4bf; margin: top: 0.75rem; border-radius: 9999px; opacity: 0.5; margin-left: auto; margin-right: auto;}
+        .brand-footer-line { width: 3rem; height: 4px; background-color: #2dd4bf; margin: top 0.75rem; border-radius: 9999px; opacity: 0.5; margin-left: auto; margin-right: auto;}
 
         .form-header { margin-bottom: 2rem; text-align: center; }
         @media (min-width: 768px) { .form-header { text-align: left; } }
@@ -142,7 +142,7 @@
             border: 1px solid #fee2e2; text-align: center;
         }
 
-        /* Change Password Modal Pure CSS */
+        /* Change Password Modal */
         #forcePasswordModal {
             position: fixed; inset: 0; z-index: 10000;
             background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
@@ -170,10 +170,9 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner-spin { animation: spin 1s linear infinite; }
         
-        /* Fix Spinner Size strictly */
         #loginSpinner { width: 1.25rem !important; height: 1.25rem !important; flex-shrink: 0; margin-right: 0.25rem; }
 
-        /* --- Main App Styles (Original) --- */
+        /* --- Main App Styles --- */
         #wp-lab-app-container { display: block; font-family: 'Prompt', sans-serif !important; background-color: #f8fafc; min-height: 100vh; padding: 1.5rem; color: #1e293b; }
         #wp-lab-app-container * { box-sizing: border-box; }
         .hidden-important { display: none !important; }
@@ -207,7 +206,6 @@
 <div id="login-overlay">
     <div class="login-wrapper animate-zoom-in">
         
-        <!-- Left Side: Branding -->
         <div class="login-brand-side">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brand-main-icon">
                 <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/>
@@ -223,7 +221,6 @@
             </div>
         </div>
 
-        <!-- Right Side: Form -->
         <div class="login-form-side">
             <div class="form-header">
                 <div class="auth-badge">
@@ -243,7 +240,6 @@
                 <div class="modern-input-group">
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" class="modern-input" placeholder="••••••••" required>
-                    <!-- ปุ่ม Show/Hide Password ตัวใหม่แบบไอคอนเดียว -->
                     <button type="button" class="password-toggle-modern" id="togglePasswordBtn" title="แสดง/ซ่อนรหัสผ่าน">
                         <svg id="eyeIconSvg" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
@@ -253,7 +249,6 @@
                 </div>
                 
                 <button type="submit" class="modern-login-btn" id="loginSubmitBtn">
-                    <!-- ไอคอนหมุนโหลด (ซ่อนไว้ก่อน กำหนดขนาดให้ชัดเจนด้วย CSS !important ด้านบน) -->
                     <svg id="loginSpinner" class="spinner-spin hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -267,7 +262,6 @@
     </div>
 </div>
 
-<!-- Modal: บังคับเปลี่ยนรหัสผ่านครั้งแรก (ย้ายออกมานอก Container หลัก เพื่อป้องกันการเลื่อนจอ) -->
 <div id="forcePasswordModal" class="hidden">
     <div class="modal-card animate-zoom-in">
         <div class="modal-icon-wrap">
@@ -349,51 +343,74 @@
                     
                     <div class="space-y-6">
                         <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">ข้อมูลทั่วไป</h3>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Date Ordered</label><input type="date" name="orderDate" id="field_orderDate" required class="w-full rounded-xl border-slate-300 p-3 text-sm focus:ring-2 focus:ring-cyan-500 border outline-none"></div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Animal Type</label><select name="animalType" id="field_animalType" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">เลือกประเภทสัตว์</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option></select></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Date Ordered <span class="text-red-500">*</span></label><input type="date" name="orderDate" id="field_orderDate" required class="w-full rounded-xl border-slate-300 p-3 text-sm focus:ring-2 focus:ring-cyan-500 border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Animal Type <span class="text-red-500">*</span></label><select name="animalType" id="field_animalType" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">เลือกประเภทสัตว์</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option></select></div>
                         <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Species</label><input type="text" name="species" id="field_species" list="list_species" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Disease Name</label><input type="text" name="disease" id="field_disease" list="list_disease" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Disease Name <span class="text-red-500">*</span></label><input type="text" name="disease" id="field_disease" list="list_disease" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Company Name</label><input type="text" name="company" id="field_company" list="list_company" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reference</label><textarea name="reference" id="field_reference" rows="2" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></textarea></div>
                     </div>
 
                     <div class="space-y-6">
                         <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">รายละเอียด</h3>
-                        <div><label id="label_name" class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Name</label><input type="text" name="primerName" id="field_primerName" required class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold border outline-none"></div>
+                        <div><label id="label_name" class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Name <span class="text-red-500">*</span></label><input type="text" name="primerName" id="field_primerName" required class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold border outline-none"></div>
                         <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Primer Original Name</label><input type="text" name="originalName" id="field_originalName" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         <div class="grid grid-cols-2 gap-3">
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">TA (°C)</label><input type="text" name="ta" id="field_ta" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Size (bp)</label><input type="text" name="productSize" id="field_productSize" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         </div>
                         <div id="group_probe" class="space-y-4">
-                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Probe Seq <span id="probe_counter" class="bp-badge">0 bp.</span></label><input type="text" name="probe" id="field_probe" oninput="updateBP('field_probe', 'probe_counter')" class="w-full rounded-xl border-slate-300 p-3 text-sm font-mono border outline-none"></div>
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Probe Seq <span id="probe_counter" class="bp-badge">0 bp.</span></label><input type="text" name="probe" id="field_probe" readonly onclick="openSeqEditor('field_probe', 'Probe Sequence')" class="w-full rounded-xl border-slate-300 p-3 text-sm font-mono border outline-none cursor-pointer placeholder-slate-400" placeholder="Click to edit..."></div>
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Fluorescent</label><select name="fluorescent" id="field_fluorescent" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="FAM">FAM</option><option value="HEX">HEX</option><option value="VIC">VIC</option><option value="Cy5">Cy5</option><option value="TXR">TXR</option></select></div>
                             <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Target Gene</label><input type="text" name="targetGene" id="field_targetGene" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"></div>
                         </div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Method</label><select name="method" id="field_method" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="PCR">PCR</option><option value="RT-PCR">RT-PCR</option><option value="qPCR">qPCR</option><option value="RT-qPCR">RT-qPCR</option><option value="ddPCR">ddPCR</option></select></div>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Method <span class="text-red-500">*</span></label><select name="method" id="field_method" class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none"><option value="">-</option><option value="PCR">PCR</option><option value="RT-PCR">RT-PCR</option><option value="qPCR">qPCR</option><option value="RT-qPCR">RT-qPCR</option><option value="ddPCR">ddPCR</option></select></div>
                         <div id="group_primer" class="grid grid-cols-2 gap-3">
-                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Forward <span id="fwd_counter" class="bp-badge">0 bp.</span></label><input type="text" name="forward" id="field_forward" oninput="updateBP('field_forward', 'fwd_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
-                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reward <span id="rev_counter" class="bp-badge">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" oninput="updateBP('field_reverse', 'rev_counter')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none"></div>
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Forward <span id="fwd_counter" class="bp-badge">0 bp.</span></label><input type="text" name="forward" id="field_forward" readonly onclick="openSeqEditor('field_forward', 'Forward Sequence')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none cursor-pointer placeholder-slate-400" placeholder="Click to edit..."></div>
+                            <div><label class="flex justify-between items-center text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Reward <span id="rev_counter" class="bp-badge">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" readonly onclick="openSeqEditor('field_reverse', 'Reward (Reverse) Sequence')" class="w-full rounded-xl border-slate-300 p-3 text-[10px] font-mono border outline-none cursor-pointer placeholder-slate-400" placeholder="Click to edit..."></div>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <h3 class="text-sm font-bold text-brand-700 bg-brand-50 px-4 py-2 rounded-xl inline-block">Storage & Monitoring</h3>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Box Name</label><input type="text" name="box" id="form_box" list="list_box_options" required class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none font-bold text-slate-900"><span id="box_error" class="error-text hidden">กรุณาระบุชื่อกล่องก่อนเลือกพิกัด Slot</span></div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Slot</label>
-                            <div id="slotInputContainer" class="space-y-2"><div class="flex gap-1"><input type="text" name="slot" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" readonly><button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg></button></div></div>
-                            <button type="button" id="btn_add_slot" onclick="addSlotField()" class="mt-2 text-[10px] font-bold text-brand-600 uppercase">+ Add Slot</button>
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Box Name <span class="text-red-500">*</span></label><input type="text" name="box" id="form_box" list="list_box_options" required class="w-full rounded-xl border-slate-300 p-3 text-sm border outline-none font-bold text-slate-900"><span id="box_error" class="error-text hidden">กรุณาระบุชื่อกล่องก่อนเลือกพิกัด Slot</span></div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label id="label_slot_section" class="block text-[11px] font-bold text-slate-900 uppercase tracking-wider">Slot <span class="text-red-500">*</span></label>
+                                <button type="button" id="btn_add_slot" onclick="addSlotField()" class="text-[10px] font-bold text-brand-600 uppercase border border-brand-200 px-2 py-1 rounded hover:bg-brand-50">+ Add Slot</button>
+                            </div>
+                            <div id="slotInputContainer" class="space-y-2">
+                                <!-- Slot rows will be injected here -->
+                            </div>
                             <span id="slot_conflict_error" class="error-text hidden">ตำแหน่ง Slot นี้ถูกใช้งานแล้ว โปรดเปลี่ยนตำแหน่งใหม่</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Volume (ul.)</label><input type="number" name="volume" id="field_volume" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-emerald-700 border outline-none"></div>
-                            <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Low Level</label><input type="number" name="lowLevel" id="field_lowLevel" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-red-600 border outline-none"></div>
-                        </div>
+                        <input type="hidden" name="volume" id="field_volume"> <!-- Hidden total volume -->
+                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Low Level <span class="text-red-500">*</span></label><input type="number" name="lowLevel" id="field_lowLevel" class="w-full rounded-xl border-slate-300 p-3 text-sm font-bold text-red-600 border outline-none"></div>
+                        
                         <div id="movement_extra" class="hidden animate-in slide-in-from-top-2 duration-300">
+                            <!-- New Section for Multi-slot -->
+                            <div id="movement_multi_slot_ui" class="hidden mb-4 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-2 uppercase">เลือก Slot ที่ต้องการตัดสต๊อก</label>
+                                <div id="movement_slot_buttons" class="flex flex-wrap gap-2"></div>
+                                <p id="movement_selected_slot_info" class="mt-2 text-[10px] font-bold text-cyan-700"></p>
+                            </div>
+                            
+                            <!-- Display Volume Field -->
+                            <div class="mb-4">
+                                <label class="block text-[11px] font-bold text-brand-700 mb-1 uppercase tracking-wider">Volume (ul.) - คงเหลือ</label>
+                                <input type="text" id="movement_current_slot_vol" readonly class="w-full rounded-xl bg-slate-100 border-slate-200 border p-3 text-sm font-bold text-slate-700 outline-none" placeholder="เลือก Slot เพื่อดูปริมาณ">
+                            </div>
+
+                            <!-- Display Usage Count Field -->
+                            <div class="mb-4">
+                                <label class="block text-[11px] font-bold text-brand-700 mb-1 uppercase tracking-wider">Usage Count (ครั้งที่ใช้)</label>
+                                <input type="text" id="movement_current_slot_usage" readonly class="w-full rounded-xl bg-slate-100 border-slate-200 border p-3 text-sm font-bold text-slate-700 outline-none" placeholder="เลือก Slot เพื่อดูจำนวนครั้ง">
+                            </div>
+
                             <label class="block text-[11px] font-bold text-brand-700 mb-1 uppercase tracking-wider">ใช้ไป (ul)</label>
                             <input type="number" id="field_usedAmount" oninput="calculateRemainingVol()" placeholder="ระบุจำนวนที่ใช้" class="w-full rounded-xl bg-brand-50 border-brand-200 border p-3 text-sm font-bold text-brand-900 outline-none">
                         </div>
-                        <div><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Usage Count</label><input type="number" name="usageCount" id="field_usageCount" class="w-full rounded-xl bg-amber-50 p-3 text-sm font-bold text-amber-700 border-amber-200 border outline-none"></div>
+                        <div id="total_usage_section"><label class="block text-[11px] font-bold text-slate-900 mb-1 uppercase tracking-wider">Total Usage Count</label><input type="number" name="usageCount" id="field_usageCount" class="w-full rounded-xl bg-amber-50 p-3 text-sm font-bold text-amber-700 border-amber-200 border outline-none"></div>
                     </div>
 
                     <div class="md:col-span-3 flex justify-end gap-4 pt-6 border-t mt-4">
@@ -405,6 +422,7 @@
         </div>
 
         <div id="view-list" class="space-y-6">
+            <!-- Table View Code (Unchanged) -->
             <div class="bg-white p-6 rounded-4xl shadow-md border border-slate-200 space-y-6">
                 <div class="flex flex-col md:flex-row gap-6 justify-between items-center">
                     <div class="relative w-full md:max-w-md">
@@ -483,6 +501,7 @@
         </div>
 
         <div id="view-history" class="hidden animate-in fade-in duration-300">
+            <!-- History View Code (Unchanged) -->
             <div class="bg-white rounded-4xl p-8 md:p-10 shadow-md border border-slate-200">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6 gap-4">
                     <h2 class="text-2xl font-bold">Activity Logs</h2>
@@ -519,7 +538,7 @@
                 <div class="bg-slate-100 p-6 rounded-[32px] border-2 border-slate-200 shadow-inner overflow-x-auto">
                     <div class="grid-container" id="picker-grid-container"></div>
                 </div>
-                <div class="mt-8 flex justify-between items-center text-[10px] font-bold uppercase"><span>* BLUE = OCCUPIED / BORDERED = IN-FORM</span><button onclick="closeSlotPicker()" class="px-10 py-3 bg-slate-900 text-white rounded-2xl uppercase shadow-lg">Confirm</button></div>
+                <div class="mt-8 flex justify-between items-center text-[10px] font-bold uppercase"><span>* RED = OCCUPIED / BORDERED = IN-FORM</span><button onclick="closeSlotPicker()" class="px-10 py-3 bg-slate-900 text-white rounded-2xl uppercase shadow-lg">Confirm</button></div>
             </div>
         </div>
 
@@ -538,6 +557,22 @@
                 <h3 class="font-bold text-xl mb-4 uppercase">Confirm Delete?</h3>
                 <p id="deleteItemName" class="text-sm text-slate-500 mb-10 font-bold italic"></p>
                 <div class="flex gap-4"><button onclick="closeDeleteModal()" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold uppercase border">No</button><button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-lg uppercase">Yes, Delete</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sequence Edit Modal -->
+    <div id="seqEditModal" class="fixed inset-0 z-[10002] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSeqEditor()"></div>
+        <div class="relative bg-white w-full max-w-2xl rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <h3 id="seqEditTitle" class="text-xl font-bold text-brand-700">Edit Sequence</h3>
+                <span id="seqEditCounterModal" class="text-sm font-bold bg-brand-100 text-brand-700 px-3 py-1 rounded-full">0 bp</span>
+            </div>
+            <textarea id="seqEditInput" rows="5" class="w-full rounded-2xl border-2 border-slate-200 p-4 text-lg font-mono uppercase focus:border-brand-500 outline-none" placeholder="ATCG..."></textarea>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeSeqEditor()" class="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100">Cancel</button>
+                <button type="button" onclick="saveSeqEditor()" class="px-8 py-3 rounded-xl font-bold bg-brand-600 text-white shadow-lg hover:bg-brand-700">Confirm</button>
             </div>
         </div>
     </div>
@@ -587,12 +622,10 @@
     // --- AUTH LOGIC ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // ตรวจสอบจาก Firebase คอลเลกชัน 'users' ว่าเคยเปลี่ยนรหัสหรือยัง
-            const userSettingsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'users', 'status');
+            const userSettingsRef = doc(db, 'users', user.email);
             const userSnap = await getDoc(userSettingsRef);
             
             if (!userSnap.exists() || !userSnap.data().passwordChanged) {
-                // บังคับเปลี่ยนรหัสผ่าน
                 document.getElementById('login-overlay').classList.add('hidden-important');
                 document.getElementById('wp-lab-app-container').classList.add('hidden-important');
                 document.getElementById('forcePasswordModal').classList.remove('hidden');
@@ -614,7 +647,6 @@
         }
     });
 
-    // ฟังชั่นเปลี่ยนรหัสผ่านครั้งแรก
     document.getElementById('forcePasswordForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const newPass = document.getElementById('newPassword').value;
@@ -629,8 +661,7 @@
 
         try {
             await updatePassword(auth.currentUser, newPass);
-            
-            const userSettingsRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'users', 'status');
+            const userSettingsRef = doc(db, 'users', auth.currentUser.email);
             await setDoc(userSettingsRef, { 
                 passwordChanged: true, 
                 updatedAt: new Date().toISOString() 
@@ -639,7 +670,6 @@
             showToast("เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบใหม่อีกครั้ง", "success");
             saveHistoryLog("Initial Password Changed", "User Security", ["Password updated on first login"]);
             
-            // Sign out users so they log in with the new password
             setTimeout(async () => {
                 await signOut(auth);
                 window.location.reload();
@@ -647,12 +677,17 @@
             
         } catch (error) {
             console.error(error);
-            errorEl.innerText = "เกิดข้อผิดพลาด: " + (error.code === 'auth/requires-recent-login' ? "กรุณาเข้าสู่ระบบใหม่อีกครั้งก่อนเปลี่ยนรหัส" : error.message);
-            errorEl.classList.remove('hidden');
+            if (error.code === 'auth/requires-recent-login') {
+                alert("ระบบความปลอดภัย: กรุณาเข้าสู่ระบบใหม่อีกครั้งก่อนเปลี่ยนรหัสผ่าน");
+                await signOut(auth);
+                window.location.reload();
+            } else {
+                errorEl.innerText = "เกิดข้อผิดพลาด: " + error.message;
+                errorEl.classList.remove('hidden');
+            }
         }
     });
 
-    // --- Login Form Enhancements (Show/Hide Password & Loading State) ---
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
     const loginPasswordInput = document.getElementById('loginPassword');
     const eyeIconSvg = document.getElementById('eyeIconSvg');
@@ -660,13 +695,9 @@
     togglePasswordBtn.addEventListener('click', () => {
         const isPassword = loginPasswordInput.getAttribute('type') === 'password';
         loginPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        
-        // สลับไอคอนวาดเส้น (Path) ภายในปุ่ม
         if (isPassword) {
-            // แสดงไอคอนตาปิด
             eyeIconSvg.innerHTML = `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>`;
         } else {
-            // แสดงไอคอนตาเปิด
             eyeIconSvg.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>`;
         }
     });
@@ -680,24 +711,17 @@
         const btnText = document.getElementById('loginBtnText');
         const spinner = document.getElementById('loginSpinner');
         
-        // 1. Set Loading State
         submitBtn.disabled = true;
         btnText.innerText = 'กำลังตรวจสอบข้อมูล...';
         spinner.classList.remove('hidden');
         errorMsg.classList.add('hidden');
         
         signInWithEmailAndPassword(auth, email, pass)
-            .then(() => {
-                // Success: The onAuthStateChanged listener will handle the transition
-                // Keep the button in loading state until the screen changes
-                saveHistoryLog("User Login", "System", ["Logged in successfully"]);
-            })
+            .then(() => { saveHistoryLog("User Login", "System", ["Logged in successfully"]); })
             .catch((error) => {
-                // 2. Reset Loading State on Error
                 submitBtn.disabled = false;
                 btnText.innerText = 'เข้าสู่ระบบ';
                 spinner.classList.add('hidden');
-                
                 errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง";
                 errorMsg.classList.remove('hidden');
             });
@@ -721,6 +745,7 @@
     let onlineLogs = [];
     let historyCurrentPage = 1;
     const historyRowsPerPage = 10;
+    let currentSeqTargetId = null; // New variable to track active seq field
 
     window.fetchData = function() { 
         onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
@@ -744,19 +769,28 @@
         if (!auth.currentUser) return;
         const userEmail = auth.currentUser.email;
         const userName = getUserName(userEmail);
-        
         try {
-            await addDoc(collection(db, LOGS_COLLECTION), {
-                ts: new Date().toISOString(),
-                action: action,
-                name: name,
-                details: details,
-                by: userName,
-                email: userEmail
+            // สร้างวันที่แบบ วัน-เดือน-ปี เวลา.นาที เพื่อใช้เป็นชื่อ ID
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear() + 543; // หรือใช้ now.getFullYear() ถ้าอยากได้ ค.ศ.
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0'); // เพิ่มวินาทีกันซ้ำ
+            
+            const customLogID = `${day}-${month}-${year} ${hours}.${minutes}.${seconds}`;
+
+            // เปลี่ยนจาก addDoc เป็น setDoc เพื่อกำหนด ID เอง
+            await setDoc(doc(db, LOGS_COLLECTION, customLogID), { 
+                ts: new Date().toISOString(), 
+                action: action, 
+                name: name, 
+                details: details, 
+                by: userName, 
+                email: userEmail 
             });
-        } catch (e) {
-            console.error("Error saving log:", e);
-        }
+        } catch (e) { console.error("Error saving log:", e); }
     };
 
     window.renderHistory = function(resetPage = false) {
@@ -790,7 +824,6 @@
         const pageLogs = filteredLogs.slice(start, start + historyRowsPerPage);
 
         if (pageLogs.length === 0) { container.innerHTML = `<div class='text-center py-20 opacity-40 uppercase font-bold text-xs'>No logs found.</div>`; return; }
-        
         container.innerHTML = pageLogs.map(l => `
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 animate-in fade-in duration-200">
                 <div class="flex items-center gap-4">
@@ -799,9 +832,7 @@
                         <span class="block text-xs font-bold">${l.name}</span>
                         <span class="text-[9px] font-bold text-slate-400 uppercase">${l.action} • ${formatDateFull(l.ts)}</span>
                     </div>
-                    <div class="text-right">
-                        <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-1 rounded-lg">By: ${l.by || 'Unknown'}</span>
-                    </div>
+                    <div class="text-right"><span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-1 rounded-lg">By: ${l.by || 'Unknown'}</span></div>
                 </div>
                 ${l.details && l.details.length ? `<div class="ml-14 mt-2 p-2 bg-white border rounded-xl text-[10px] text-slate-500 font-mono">${l.details.map(d => `<div>• ${d}</div>`).join('')}</div>` : ''}
             </div>`).join('');
@@ -827,34 +858,18 @@
                 if (parseFloat(item.volume) === 0) {
                     actionBtns = `<button onclick="moveOutOfStock('${item.id}')" class="px-4 py-2 bg-amber-500 text-white text-[10px] font-bold rounded-xl hover:bg-amber-600 uppercase shadow-sm">Out of stock</button>`;
                 } else {
-                    actionBtns = `
-                        <div class="flex justify-end gap-2">
-                            <button onclick="openMovementMode('${item.id}')" class="px-4 py-2 bg-indigo-700 text-white text-[10px] font-bold rounded-xl hover:bg-indigo-800 uppercase shadow-sm">บันทึกการใช้</button>
-                        </div>
-                    `;
+                    actionBtns = `<div class="flex justify-end gap-2"><button onclick="openMovementMode('${item.id}')" class="px-4 py-2 bg-indigo-700 text-white text-[10px] font-bold rounded-xl hover:bg-indigo-800 uppercase shadow-sm">บันทึกการใช้</button></div>`;
                 }
-            } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') {
-                actionBtns = ''; 
-            } else if (activeTab !== 'all' && activeTab !== 'export') {
-                actionBtns = `
-                    <div class="flex justify-end gap-1">
-                        <button onclick="copyItem('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">📋</button>
-                        <button onclick="openEditMode('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">✏️</button>
-                        <button onclick="openDeleteModal('${item.id}', '${item.primername}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">🗑️</button>
-                    </div>
-                `;
+            } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') { actionBtns = ''; } 
+            else if (activeTab !== 'all' && activeTab !== 'export') {
+                actionBtns = `<div class="flex justify-end gap-1"><button onclick="copyItem('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">📋</button><button onclick="openEditMode('${item.id}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">✏️</button><button onclick="openDeleteModal('${item.id}', '${item.primername}')" class="p-2 hover:bg-slate-200 rounded-lg text-slate-900 font-bold">🗑️</button></div>`;
             }
 
             let boxSlotDisplay = (item.box && item.slot) ? (item.box + '/' + item.slot) : (item.isoutofstock ? (item.prevbox + '/' + item.prevslot) : '-');
             let boxSlotStyle = (item.box && item.slot) ? 'text-cyan-800 bg-cyan-100 border-cyan-200' : 'text-slate-400 bg-slate-100 border-slate-200 italic';
+            let displayID = item.id; if (displayID.length > 6 && isNaN(displayID)) { displayID = displayID.substring(0,6) + "..."; }
 
-            let displayID = item.id;
-            if (displayID.length > 6 && isNaN(displayID)) {
-                displayID = displayID.substring(0,6) + "...";
-            }
-
-            return `
-            <tr class="custom-table-row transition-all border-b border-slate-200 cursor-pointer" onclick="showDetails('${item.id}')">
+            return `<tr class="custom-table-row transition-all border-b border-slate-200 cursor-pointer" onclick="showDetails('${item.id}')">
                 <td class="px-6 py-4 text-center text-slate-900 font-bold text-[11px]">${startIdx + index + 1}</td>
                 <td class="px-6 py-4 text-slate-900 text-center font-bold whitespace-nowrap text-[11px]">${formatDateOnly(item.orderdate)}</td>
                 <td class="px-6 py-4 text-slate-500 text-center font-mono text-[10px]">${displayID}</td>
@@ -933,13 +948,7 @@
     window.moveOutOfStock = async function(id) {
         const item = dataList.find(d => d.id === id); if (!item) return;
         try {
-            await updateDoc(doc(db, COLLECTION_NAME, id), {
-                prevbox: item.box,
-                prevslot: item.slot,
-                box: "",
-                slot: "",
-                isoutofstock: true
-            });
+            await updateDoc(doc(db, COLLECTION_NAME, id), { prevbox: item.box, prevslot: item.slot, box: "", slot: "", isoutofstock: true });
             saveHistoryLog("Moved Out of Stock", item.primername, [`Storage: ${item.box}/${item.slot} -> Out of stock`]);
             showToast("ย้ายรายการไปที่ 'Out of stock' เรียบร้อย", "success");
         } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
@@ -948,11 +957,7 @@
     window.undoOutOfStock = async function(id) {
         const item = dataList.find(d => d.id === id); if (!item) return;
         try {
-            await updateDoc(doc(db, COLLECTION_NAME, id), {
-                box: item.prevbox,
-                slot: item.prevslot,
-                isoutofstock: false
-            });
+            await updateDoc(doc(db, COLLECTION_NAME, id), { box: item.prevbox, slot: item.prevslot, isoutofstock: false });
             saveHistoryLog("Restored Stock", item.primername, [`Out of stock -> Storage: ${item.prevbox}/${item.prevslot}`]);
             showToast("คืนค่ารายการเรียบร้อย", "success");
         } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
@@ -962,6 +967,11 @@
         const f = document.getElementById('data-form'); if (!f) return;
         if (type === null) { f.classList.add('hidden'); return; }
         isEditMode = false; isMovementMode = false; currentFormType = type;
+        
+        // Reset label for Add/Edit mode
+        document.getElementById('label_slot_section').innerHTML = 'Slot / Volume (ul.) <span class="text-red-500">*</span>';
+        document.getElementById('total_usage_section').classList.remove('hidden'); // Show total usage in edit/add mode
+        
         document.getElementById('labForm').reset(); document.getElementById('editingId').value = ""; document.getElementById('field_itemType').value = type;
         document.getElementById('movement_extra').classList.add('hidden');
         document.getElementById('form_box').classList.remove('input-error');
@@ -978,32 +988,81 @@
         const go = document.getElementById('group_probe');
         if (type === 'PRIMER') { ln.innerText = "Primer Name"; go.classList.add('hidden'); gp.classList.remove('hidden'); }
         else { ln.innerText = "Probe Name"; gp.classList.add('hidden'); go.classList.remove('hidden'); }
-        updateBP('field_forward', 'fwd_counter'); 
-        updateBP('field_reverse', 'rev_counter');
-        updateBP('field_probe', 'probe_counter');
+        updateBP('field_forward', 'fwd_counter'); updateBP('field_reverse', 'rev_counter'); updateBP('field_probe', 'probe_counter');
     };
 
     window.updateBP = function(id, counterId) {
         const val = document.getElementById(id).value.trim();
         const counterEl = document.getElementById(counterId);
-        if (counterEl) {
-            counterEl.innerText = val.length + " bp.";
-        }
+        if (counterEl) { counterEl.innerText = val.length + " bp."; }
     };
 
-    window.addSlotField = function(val = "") {
+    window.openSeqEditor = function(targetId, title) {
+        currentSeqTargetId = targetId;
+        const val = document.getElementById(targetId).value;
+        document.getElementById('seqEditTitle').innerText = title;
+        const input = document.getElementById('seqEditInput');
+        input.value = val;
+        
+        // Update modal counter
+        const len = val.trim().length;
+        document.getElementById('seqEditCounterModal').innerText = len + " bp";
+        
+        // Setup listener for typing
+        input.oninput = function() {
+            document.getElementById('seqEditCounterModal').innerText = this.value.trim().length + " bp";
+        };
+
+        document.getElementById('seqEditModal').classList.remove('hidden');
+        document.getElementById('seqEditModal').classList.add('flex');
+    };
+
+    window.closeSeqEditor = function() {
+        document.getElementById('seqEditModal').classList.add('hidden');
+        document.getElementById('seqEditModal').classList.remove('flex');
+        currentSeqTargetId = null;
+    };
+
+    window.saveSeqEditor = function() {
+        if(currentSeqTargetId) {
+            const val = document.getElementById('seqEditInput').value;
+            document.getElementById(currentSeqTargetId).value = val;
+            
+            // Trigger updateBP
+            if(currentSeqTargetId === 'field_forward') updateBP('field_forward', 'fwd_counter');
+            if(currentSeqTargetId === 'field_reverse') updateBP('field_reverse', 'rev_counter');
+            if(currentSeqTargetId === 'field_probe') updateBP('field_probe', 'probe_counter');
+        }
+        closeSeqEditor();
+    };
+
+    window.addSlotField = function(slotVal = "", volVal = "") {
         const container = document.getElementById('slotInputContainer');
         const div = document.createElement('div'); 
-        div.className = "flex gap-1 animate-in slide-in-from-right-2";
+        div.className = "flex gap-2 animate-in slide-in-from-right-2 mb-2 items-center";
+        
         let btnHtml = "";
+        let volInputHtml = "";
+        
         if (!isMovementMode) {
-            btnHtml = '<button type="button" onclick="this.parentElement.remove()" class="p-3 text-red-500 font-bold">✕</button>';
+            // Edit/Add Mode: Slot Picker + Volume Input + Delete Button
+            volInputHtml = `<input type="number" placeholder="Vol." value="${volVal}" class="volume-input w-24 rounded-xl bg-white border-slate-300 p-3 text-sm font-bold border outline-none text-emerald-700" oninput="calculateTotalVolume()">`;
+            // Only show delete button if it's not the very first row or allow deleting any row but ensure logic handles empty
+            btnHtml = '<button type="button" onclick="this.parentElement.remove(); calculateTotalVolume()" class="p-3 text-red-500 font-bold hover:bg-red-50 rounded-xl">✕</button>';
+        } else {
+            // Movement Mode: Just readonly Slot
+            volInputHtml = ""; 
+            btnHtml = "";
         }
+
         div.innerHTML = `
-            <input type="text" name="slot" value="${val}" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" ${isMovementMode ? 'readonly' : ''}>
-            <button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl ${isMovementMode ? 'hidden' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
-            </button>
+            <div class="flex-1 flex gap-1">
+                <input type="text" name="slot" value="${slotVal}" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" ${isMovementMode ? 'readonly' : 'readonly'}>
+                <button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl ${isMovementMode ? 'hidden' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                </button>
+            </div>
+            ${volInputHtml}
             ${btnHtml}
         `;
         container.appendChild(div);
@@ -1012,28 +1071,27 @@
     window.resetSlotFields = function(slots = [""]) {
         const container = document.getElementById('slotInputContainer'); 
         container.innerHTML = "";
-        slots.forEach((s, idx) => {
-            const div = document.createElement('div'); div.className = "flex gap-1";
-            let btnHtml = "";
-            if (idx > 0 && !isMovementMode) {
-                btnHtml = '<button type="button" onclick="this.parentElement.remove()" class="p-3 text-red-500 font-bold">✕</button>';
-            }
-            div.innerHTML = `
-                <input type="text" name="slot" value="${s.trim()}" class="slot-input w-full rounded-xl bg-slate-50 p-3 text-sm border text-center font-bold outline-none" readonly>
-                <button type="button" onclick="openSlotPicker(this)" class="p-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 ${isMovementMode ? 'hidden' : ''}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
-                </button>
-                ${btnHtml}
-            `;
-            container.appendChild(div);
+        // If editing, we might have volumes associated. But current data structure separates them.
+        // For now, logic is: add 1 default row if empty.
+        if(slots.length === 0) slots = [""];
+        slots.forEach((s) => addSlotField(s.trim()));
+    };
+
+    window.calculateTotalVolume = function() {
+        if(isMovementMode) return;
+        let total = 0;
+        document.querySelectorAll('.volume-input').forEach(inp => {
+            total += parseFloat(inp.value || 0);
         });
+        document.getElementById('field_volume').value = total;
     };
 
     window.setFieldsStatus = function(isMovement) {
-        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_ta', 'field_productSize', 'field_company', 'field_reference', 'field_lowLevel', 'form_box', 'field_volume', 'field_usageCount'];
+        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_company', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel'];
         all.forEach(id => {
-            const el = document.getElementById(id); if (!el) return;
-            const isAllowedInMovement = ['field_usedAmount', 'field_usageCount'].includes(id);
+            const el = document.getElementById(id) || document.getElementById(id.replace('field_', 'form_')); 
+            if (!el) return;
+            const isAllowedInMovement = ['field_usedAmount'].includes(id); // usageCount no longer directly editable in movement
             const isEditable = !isMovement || isAllowedInMovement;
             el.readOnly = !isEditable; 
             el.classList.toggle('input-readonly', !isEditable);
@@ -1058,10 +1116,46 @@
 
     document.getElementById('labForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        // 1. Mandatory Field Validation
+        const requiredFields = [
+            { id: 'field_orderDate', label: 'Date Ordered' },
+            { id: 'field_animalType', label: 'Animal Type' },
+            { id: 'field_disease', label: 'Disease Name' },
+            { id: 'field_primerName', label: 'Name' },
+            { id: 'field_method', label: 'Method' },
+            { id: 'form_box', label: 'Box Name' },
+            { id: 'field_lowLevel', label: 'Low Level' }
+        ];
+        
+        let missing = [];
+        requiredFields.forEach(f => {
+            const el = document.getElementById(f.id);
+            if (!el || !el.value.trim()) missing.push(f.label);
+        });
+
+        // Check Slots & Volume
+        const slotInputs = document.querySelectorAll('.slot-input');
+        const volInputs = document.querySelectorAll('.volume-input');
+        let hasSlot = false;
+        let hasVol = false;
+        slotInputs.forEach(i => { if(i.value.trim()) hasSlot = true; });
+        if(!isMovementMode) {
+            volInputs.forEach(i => { if(i.value.trim()) hasVol = true; });
+            if(!hasVol) missing.push("Volume (ul.)");
+        }
+        if(!hasSlot) missing.push("Slot");
+
+        if (missing.length > 0) {
+            alert("กรุณากรอกข้อมูลให้ครบถ้วน:\n- " + missing.join("\n- "));
+            return;
+        }
+
         const curId = document.getElementById('editingId').value;
         const curBox = document.getElementById('form_box').value.trim().toUpperCase();
-        const selectedSlots = Array.from(document.querySelectorAll('.slot-input')).map(i => i.value.trim().toUpperCase()).filter(v => v !== "");
         
+        // 2. Conflict Check (On Submit for safety, though UI handles it too)
+        const selectedSlots = Array.from(slotInputs).map(i => i.value.trim().toUpperCase()).filter(v => v !== "");
         const conflict = dataList.find(i => {
             if (i.id === curId || i.isoutofstock || String(i.box).toUpperCase() !== curBox) return false;
             const itemSlots = String(i.slot).split(',').map(s => s.trim().toUpperCase());
@@ -1073,6 +1167,7 @@
             showToast("พิกัดซ้ำ กรุณาตรวจสอบ", "error"); return;
         }
 
+        // 3. Prepare Data
         const formData = new FormData(this);
         let newItem = { slot: [] };
         formData.forEach((v, k) => { 
@@ -1081,9 +1176,19 @@
         });
         
         newItem.slot = newItem.slot.join(', ');
-        newItem.volume = parseFloat(newItem.volume || 0);
-        newItem.usagecount = parseInt(newItem.usagecount || 0);
+        // Recalculate total volume just in case
+        if(!isMovementMode) calculateTotalVolume();
+        newItem.volume = parseFloat(document.getElementById('field_volume').value || 0);
         
+        // Store individual volumes if available
+        if(!isMovementMode) {
+            let volumesArr = [];
+            document.querySelectorAll('.volume-input').forEach(inp => volumesArr.push(parseFloat(inp.value||0)));
+            newItem.volumes = volumesArr;
+            // Also update total usage count from input in add/edit mode
+            newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
+        }
+
         const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reverse': 'Reverse', 'company': 'Company', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
 
         try {
@@ -1092,12 +1197,44 @@
                 let diffs = [];
                 
                 if (isMovementMode) { 
-                    newItem.usagecount += 1; 
-                    diffs.push(`Used: ${document.getElementById('field_usedAmount').value} ul`);
-                    diffs.push(`Volume: ${originalItem.volume} -> ${newItem.volume}`);
+                    const slots = originalItem.slot ? originalItem.slot.split(',') : [];
+                    if (slots.length > 1 && !window.selectedMovementSlot) {
+                        showToast("กรุณาเลือก Slot ที่ต้องการตัดสต๊อก", "error"); return;
+                    }
+                    
+                    const slotIndex = slots.findIndex(s => s.trim() === window.selectedMovementSlot);
+                    const usageVal = parseFloat(document.getElementById('field_usedAmount').value || 0);
+                    
+                    // Update arrays
+                    let currentVolumes = originalItem.volumes ? [...originalItem.volumes] : [originalItem.volume];
+                    let currentUsageCounts = originalItem.usagecounts ? [...originalItem.usagecounts] : [originalItem.usagecount || 0];
+                    
+                    // Ensure arrays are long enough (in case added slots later without init)
+                    while(currentVolumes.length < slots.length) currentVolumes.push(0);
+                    while(currentUsageCounts.length < slots.length) currentUsageCounts.push(0);
+
+                    // Update specific slot
+                    const oldSlotVol = currentVolumes[slotIndex] || 0;
+                    const newSlotVol = Math.max(0, oldSlotVol - usageVal);
+                    currentVolumes[slotIndex] = newSlotVol;
+                    currentUsageCounts[slotIndex] = (currentUsageCounts[slotIndex] || 0) + 1;
+
+                    newItem.volumes = currentVolumes;
+                    newItem.usagecounts = currentUsageCounts;
+                    
+                    // Recalculate totals
+                    newItem.volume = currentVolumes.reduce((a, b) => a + b, 0);
+                    newItem.usagecount = currentUsageCounts.reduce((a, b) => a + b, 0);
+
+                    diffs.push(`Used: ${usageVal} ul from Slot: ${window.selectedMovementSlot || 'Main'}`);
+                    diffs.push(`Slot Volume: ${oldSlotVol} -> ${newSlotVol}`);
                     saveHistoryLog("Usage Recorded", newItem.primername, diffs);
                 } else { 
-                    newItem.initialVolume = newItem.volume; 
+                    // Edit Mode
+                    newItem.initialVolume = newItem.volume; // Update total initial if edited
+                    // Update initialVolumes array if editing
+                    newItem.initialVolumes = newItem.volumes; // Assuming edit resets "initial" state for report
+                    
                     Object.keys(labelsMap).forEach(key => {
                         let oldV = String(originalItem[key] || '-');
                         let newV = String(newItem[key] || '-');
@@ -1105,15 +1242,15 @@
                     });
                     saveHistoryLog("Detail Updated", newItem.primername, diffs);
                 }
-                
                 await updateDoc(doc(db, COLLECTION_NAME, curId), newItem);
             } else {
                 newItem.orderdate = newItem.orderdate ? new Date(newItem.orderdate).toISOString() : new Date().toISOString();
                 newItem.initialVolume = newItem.volume;
+                newItem.initialVolumes = newItem.volumes; // Store array of initial volumes
+                newItem.usagecounts = newItem.volumes.map(() => 0); // Init usage counts per slot
                 newItem.isoutofstock = false;
                 const customId = generateNextID();
                 newItem.id = customId; 
-                
                 await setDoc(doc(db, COLLECTION_NAME, customId), newItem);
                 saveHistoryLog("Registered New", newItem.primername, [`ID: ${customId}`, "Initial Registration"]);
             }
@@ -1128,13 +1265,21 @@
         activeSlotInput = btn.parentElement.querySelector('.slot-input');
         const boxInput = document.getElementById('form_box');
         if(!boxInput.value) { boxInput.classList.add('input-error'); document.getElementById('box_error').classList.remove('hidden'); return; }
+        
+        // 1. Get Occupied Slots from DB (Red)
         const occupied = {};
         dataList.filter(i => !i.isoutofstock && String(i.box).toUpperCase() === boxInput.value.toUpperCase() && i.slot).forEach(i => {
-            if (isEditMode && i.id === document.getElementById('editingId').value) return;
+            if (isEditMode && i.id === document.getElementById('editingId').value) return; // Don't count self as occupied when editing
             i.slot.split(',').forEach(s => occupied[s.trim().toUpperCase()] = true);
         });
+
+        // 2. Get Pending Slots from Current Form (Blue/Locked)
         const inForm = {};
-        document.querySelectorAll('.slot-input').forEach(i => { if (i.value) inForm[i.value.toUpperCase()] = true; });
+        document.querySelectorAll('.slot-input').forEach(i => { 
+            // Exclude the input we are currently picking for
+            if (i !== activeSlotInput && i.value) inForm[i.value.trim().toUpperCase()] = true; 
+        });
+
         generateGrid('picker-grid-container', 'selectSlot', occupied, activeSlotInput.value, inForm);
         document.getElementById('slotPickerModal').classList.remove('hidden'); document.getElementById('slotPickerModal').classList.add('flex');
     };
@@ -1153,11 +1298,66 @@
     window.openMovementMode = function(id) {
         const item = dataList.find(d => d.id === id); if(!item) return;
         isEditMode = true; isMovementMode = true; currentFormType = item.itemtype || 'PRIMER';
+        
+        document.getElementById('label_slot_section').innerHTML = 'Slot'; // Change label to just "Slot"
+        document.getElementById('total_usage_section').classList.add('hidden'); // Hide total usage input in movement mode
+        
         document.getElementById('movement_extra').classList.remove('hidden');
         document.getElementById('field_usedAmount').value = "";
-        document.getElementById('field_volume').dataset.orig = item.volume;
+        
+        // Multi-slot Logic
+        const slots = item.slot ? item.slot.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        const volumes = item.volumes || [item.volume]; 
+        const usages = item.usagecounts || [item.usagecount || 0];
+
+        const ui = document.getElementById('movement_multi_slot_ui');
+        const container = document.getElementById('movement_slot_buttons');
+        const volInput = document.getElementById('movement_current_slot_vol');
+        const usageInput = document.getElementById('movement_current_slot_usage');
+        
+        window.selectedMovementSlot = null;
+        container.innerHTML = "";
+        if(volInput) volInput.value = ""; 
+        if(usageInput) usageInput.value = "";
+        
+        // Helper to update display
+        const updateSlotDisplay = (idx) => {
+             const v = (volumes[idx] !== undefined) ? volumes[idx] : 0;
+             const u = (usages[idx] !== undefined) ? usages[idx] : 0;
+             if(volInput) volInput.value = v;
+             if(usageInput) usageInput.value = u;
+             document.getElementById('field_volume').dataset.orig = v; // Bind current slot vol for calculation
+        };
+
+        if (slots.length > 1) {
+            ui.classList.remove('hidden');
+            slots.forEach((s, idx) => {
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "px-3 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold hover:bg-cyan-50 focus:ring-2 ring-cyan-500 transition-all";
+                btn.innerText = s;
+                btn.onclick = () => {
+                    Array.from(container.children).forEach(b => b.className = "px-3 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold hover:bg-cyan-50 transition-all");
+                    btn.className = "px-3 py-1 bg-cyan-600 text-white border border-cyan-700 rounded-lg text-xs font-bold shadow-md transform scale-105 transition-all";
+                    window.selectedMovementSlot = s;
+                    updateSlotDisplay(idx);
+                };
+                container.appendChild(btn);
+            });
+        } else {
+            ui.classList.add('hidden');
+            if (slots.length === 1) {
+                 window.selectedMovementSlot = slots[0];
+                 updateSlotDisplay(0);
+            } else if (slots.length === 0) {
+                 // Fallback
+                 document.getElementById('field_volume').dataset.orig = item.volume;
+            }
+        }
+
         updateFormUI(currentFormType); populateForm(item); setFieldsStatus(true);
-        document.getElementById('data-form').classList.remove('hidden'); document.getElementById('data-form').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('data-form').classList.remove('hidden'); 
+        document.getElementById('data-form').scrollIntoView({ behavior: 'smooth' });
     };
 
     window.populateForm = function(item) {
@@ -1172,7 +1372,21 @@
                 el.value = val;
             }
         }
-        resetSlotFields(item.slot ? item.slot.split(',') : [""]);
+        
+        // Handle Slots & Volumes
+        const container = document.getElementById('slotInputContainer'); 
+        container.innerHTML = "";
+        const slots = item.slot ? item.slot.split(',') : [""];
+        // Try to distribute volumes if available, else put total in first
+        const volumes = item.volumes || []; 
+        
+        slots.forEach((s, idx) => {
+            let v = "";
+            if (volumes.length > idx) v = volumes[idx];
+            else if (idx === 0 && !item.volumes) v = item.volume; // Fallback for old data
+            addSlotField(s.trim(), v);
+        });
+        
         updateBP('field_forward', 'fwd_counter'); 
         updateBP('field_reverse', 'rev_counter');
         updateBP('field_probe', 'probe_counter');
@@ -1187,13 +1401,25 @@
             html += `<div class="label-cell text-[10px] font-bold">${r}</div>`;
             for(let c=1; c<=10; c++) {
                 const slot = `${r}${c}`;
-                const isOcc = occ[slot]; const isInf = inf[slot]; const isSel = slot === sel;
+                const isOcc = occ[slot]; 
+                const isInf = inf[slot]; 
+                const isSel = slot === sel;
                 let cls = "cursor-pointer";
-                if (isOcc) cls += " occupied opacity-40";
-                else if (isSel) cls += " selected";
-                else if (isInf) cls += " in-form-selected";
-                else cls += " hover:bg-cyan-50";
-                html += `<div onclick="${cfn}('${slot}')" class="grid-cell ${cls}">${slot}</div>`;
+                let clickEvent = `${cfn}('${slot}')`;
+                
+                if (isOcc) {
+                    cls = "occupied opacity-40 cursor-not-allowed";
+                    clickEvent = "alert('ตำแหน่งนี้ถูกใช้งานแล้ว (Occupied) ไม่สามารถเลือกได้')";
+                } else if (isInf) {
+                    cls = "in-form-selected opacity-60 cursor-not-allowed"; // Blue style defined in CSS, add cursor check
+                    clickEvent = "alert('ตำแหน่งนี้ถูกเลือกไปแล้วในฟอร์มนี้')";
+                } else if (isSel) {
+                    cls += " selected";
+                } else {
+                    cls += " hover:bg-cyan-50";
+                }
+                
+                html += `<div onclick="${clickEvent}" class="grid-cell ${cls}">${slot}</div>`;
             }
         });
         container.innerHTML = html;
@@ -1233,17 +1459,14 @@
     };
 
     window.formatDateOnly = function(d) { if(!d) return '-'; const date = new Date(d); return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`; };
-    window.formatDateFull = function(d) { if(!d) return '-'; const date = new Date(d); return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; };
+    window.formatDateFull = function(d) { if(!d) return '-'; const date = new Date(d); return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear() } ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; };
     
     window.showToast = function(m, t) { 
         const overlay = document.createElement('div');
         overlay.className = "fixed inset-0 flex items-center justify-center z-[10000] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300";
         const el = document.createElement('div');
         el.className = `${t==='success'?'bg-slate-900':'bg-red-600'} text-white px-10 py-6 rounded-3xl shadow-2xl z-[10001] font-bold text-lg animate-in zoom-in-95 flex flex-col items-center gap-4`;
-        el.innerHTML = `
-            <div class="text-center">${m}</div>
-            <button class="bg-white/20 hover:bg-white/30 px-6 py-2 rounded-xl text-xs uppercase tracking-widest">ตกลง</button>
-        `;
+        el.innerHTML = `<div class="text-center">${m}</div><button class="bg-white/20 hover:bg-white/30 px-6 py-2 rounded-xl text-xs uppercase tracking-widest">ตกลง</button>`;
         overlay.appendChild(el);
         document.body.appendChild(overlay);
         el.querySelector('button').onclick = () => overlay.remove();
@@ -1258,9 +1481,55 @@
     
     window.showDetails = function(id) {
         const item = dataList.find(d => d.id === id); if(!item) return;
-        const labels = { id: 'ID', orderdate: 'วันที่สั่ง', itemtype: 'ประเภท', animaltype: 'สัตว์', species: 'สายพันธุ์', disease: 'โรค', primername: 'ชื่อ', initialVolume: 'ปริมาณตั้งต้น', volume: 'ปริมาณปัจจุบัน', usagecount: 'จำนวนครั้งที่ใช้', targetgene: 'ยีน', method: 'เทคนิค', forward: 'Forward', reverse: 'Reverse', company: 'บริษัท', ta: 'TA', productsize: 'Size', box: 'Box', slot: 'Slot', reference: 'หมายเหตุ' };
+        
+        // Custom rendering for Slots
+        let slotDetailHtml = '';
+        if (item.slot) {
+            const slots = item.slot.split(',');
+            const vols = item.volumes || [item.volume];
+            const initVols = item.initialVolumes || [item.initialVolume];
+            const usages = item.usagecounts || [item.usagecount || 0];
+            
+            slotDetailHtml = `<div class="p-4 bg-white rounded-2xl border col-span-1 md:col-span-3">
+                <span class="text-[9px] font-bold text-cyan-800 uppercase mb-2 block">Storage Details (Per Slot)</span>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">`;
+            
+            slots.forEach((s, idx) => {
+                const vol = vols[idx] !== undefined ? vols[idx] : '-';
+                const init = initVols[idx] !== undefined ? initVols[idx] : '-';
+                const use = usages[idx] !== undefined ? usages[idx] : '-';
+                slotDetailHtml += `
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <div class="font-bold text-lg text-slate-800">${s.trim()}</div>
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            <div>Init Vol: <span class="font-bold text-slate-700">${init}</span></div>
+                            <div>Curr Vol: <span class="font-bold text-emerald-600">${vol}</span></div>
+                            <div>Usage: <span class="font-bold text-amber-600">${use}</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+            slotDetailHtml += `</div></div>`;
+        }
+
+        const labels = { id: 'ID', orderdate: 'วันที่สั่ง', itemtype: 'ประเภท', animaltype: 'สัตว์', species: 'สายพันธุ์', disease: 'โรค', primername: 'ชื่อ', initialVolume: 'ปริมาณตั้งต้น (รวม)', volume: 'ปริมาณปัจจุบัน (รวม)', usagecount: 'จำนวนครั้งที่ใช้ (รวม)', targetgene: 'ยีน', method: 'เทคนิค', forward: 'Forward', reverse: 'Reverse', company: 'บริษัท', ta: 'TA', productsize: 'Size', box: 'Box', reference: 'หมายเหตุ' };
         document.getElementById('modalPrimerName').innerText = "Detail Report: " + item.primername;
-        document.getElementById('modalContent').innerHTML = Object.entries(labels).map(([k, lbl]) => `<div class="p-4 bg-white rounded-2xl border"><span class="text-[9px] font-bold text-cyan-800 uppercase">${lbl}</span><span class="block text-sm font-bold">${(k==='orderdate')?formatDateFull(item[k]):(item[k]||'-')}</span></div>`).join('');
+        
+        let content = Object.entries(labels).map(([k, lbl]) => {
+            let val = item[k];
+            if (k === 'orderdate') val = formatDateFull(val);
+            else if (!val) val = '-';
+            
+            // Add logic for bp count in Detail view
+            if (['forward', 'reverse', 'probe'].includes(k) && val !== '-') {
+                val = `${val} <span class="inline-block ml-2 px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-bold border border-slate-200">${val.length} bp.</span>`;
+            }
+            
+            return `<div class="p-4 bg-white rounded-2xl border"><span class="text-[9px] font-bold text-cyan-800 uppercase">${lbl}</span><span class="block text-sm font-bold break-all font-mono">${val}</span></div>`;
+        }).join('');
+        content += slotDetailHtml;
+
+        document.getElementById('modalContent').innerHTML = content;
         document.getElementById('detailModal').classList.remove('hidden'); document.getElementById('detailModal').classList.add('flex');
     };
 
