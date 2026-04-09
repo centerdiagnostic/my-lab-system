@@ -365,7 +365,10 @@
                 <label>ยืนยันรหัสผ่านใหม่</label>
                 <input type="password" id="confirmNewPassword" class="modern-input" placeholder="••••••••" required minlength="6">
             </div>
-            <button type="submit" class="modern-login-btn">บันทึกและเข้าสู่ระบบใหม่</button>
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="button" onclick="skipPasswordChange()" style="flex: 1; padding: 1rem; background-color: #f1f5f9; color: #475569; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; font-family: inherit; cursor: pointer;">ข้ามไปก่อน</button>
+                <button type="submit" class="modern-login-btn" style="flex: 1.5; margin-top: 0;">บันทึกและเข้าสู่ระบบ</button>
+            </div>
         </form>
         <p id="passwordError" class="error-box hidden"></p>
     </div>
@@ -387,9 +390,9 @@
         </div>
         
         <div class="flex items-center gap-4">
-            <div class="hidden md:flex flex-col items-end">
+            <div class="hidden md:flex flex-col items-end cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors" onclick="openProfileModal()">
                 <span id="userNameDisplay" class="text-sm font-bold text-slate-700">Loading...</span>
-                <span class="text-[10px] text-slate-400 font-bold uppercase">Authorized User</span>
+                <span id="userRoleDisplay" class="text-[10px] text-brand-600 font-bold uppercase">User</span>
             </div>
             <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="ออกจากระบบ">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -418,6 +421,7 @@
                     <button onclick="switchTab('storage')" id="tab-storage" class="lab-tab">กล่องเก็บ (Box Map)</button>
                     <button onclick="switchTab('history')" id="tab-history" class="lab-tab">ประวัติ</button>
                     <button onclick="switchTab('export')" id="tab-export" class="lab-tab">รายงาน</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="lab-tab hidden">จัดการผู้ใช้ (Admin)</button>
                 </div>
             </div>
 
@@ -703,8 +707,34 @@
             </div>
         </div>
 
-        <!-- Slot Picker Modal -->
-        <div id="slotPickerModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+                <div id="view-admin" class="hidden space-y-4">
+            <div class="lab-card p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Admin Panel - เพิ่มผู้ใช้งานใหม่</h2>
+                <form id="adminAddUserForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1">ชื่อ-นามสกุล</label><input type="text" id="admin_newName" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1">Email</label><input type="email" id="admin_newEmail" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1">รหัสผ่านเบื้องต้น</label><input type="password" id="admin_newPass" required minlength="6" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1">Role</label><select id="admin_newRole" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"><option value="user">ผู้ใช้งาน (User)</option><option value="admin">ผู้ดูแลระบบ (Admin)</option></select></div>
+                    <div class="md:col-span-2 flex justify-end mt-2"><button type="submit" class="btn-primary px-8">เพิ่มบัญชีผู้ใช้งาน</button></div>
+                </form>
+            </div>
+        </div>
+
+                <div id="profileModal" class="fixed inset-0 z-[10000] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="document.getElementById('profileModal').classList.add('hidden')"></div>
+            <div class="relative bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in zoom-in-95">
+                <h3 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">แก้ไขโปรไฟล์</h3>
+                <form id="profileForm" class="space-y-4">
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1">ชื่อ-นามสกุล (Display Name)</label><input type="text" id="profileName" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                    <div class="flex justify-end gap-2 pt-4">
+                        <button type="button" onclick="document.getElementById('profileModal').classList.add('hidden')" class="btn-outline px-4">ยกเลิก</button>
+                        <button type="submit" class="btn-primary px-4">บันทึกข้อมูล</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+                <div id="slotPickerModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeSlotPicker()"></div>
             <div class="relative bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col animate-in zoom-in-95">
                 <div class="flex justify-between items-center mb-4">
@@ -782,7 +812,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
     import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // --- CONFIGURATION ---
     const firebaseConfig = {
@@ -796,6 +826,8 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+    const secondaryAuth = getAuth(secondaryApp);
     const analytics = getAnalytics(app); 
     const db = getFirestore(app);
     const auth = getAuth(app); 
@@ -818,21 +850,34 @@
         if (user) {
             const userSettingsRef = doc(db, 'users', user.email);
             const userSnap = await getDoc(userSettingsRef);
+            const userData = userSnap.exists() ? userSnap.data() : {};
+            currentUserRole = userData.role || 'user';
             
-            if (!userSnap.exists() || !userSnap.data().passwordChanged) {
-                document.getElementById('login-overlay').classList.add('hidden-important');
-                document.getElementById('wp-lab-app-container').classList.add('hidden-important');
-                document.getElementById('forcePasswordModal').classList.remove('hidden');
-            } else {
+            window.proceedToApp = function() {
                 document.getElementById('forcePasswordModal').classList.add('hidden');
                 document.getElementById('login-overlay').classList.add('hidden-important');
                 document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
                 
-                const displayName = getUserName(user.email);
+                const displayName = userData.displayName || getUserName(user.email);
                 document.getElementById('userNameDisplay').innerText = displayName;
+                document.getElementById('userRoleDisplay').innerText = currentUserRole === 'admin' ? 'Administrator' : 'User';
+                
+                if (currentUserRole === 'admin') {
+                    document.getElementById('tab-admin').classList.remove('hidden');
+                } else {
+                    document.getElementById('tab-admin').classList.add('hidden');
+                }
                 
                 fetchData(); 
                 showToast(`ยินดีต้อนรับคุณ ${displayName} เข้าสู่ระบบ`, "success");
+            };
+
+            if (!userSnap.exists() || !userData.passwordChanged) {
+                document.getElementById('login-overlay').classList.add('hidden-important');
+                document.getElementById('wp-lab-app-container').classList.add('hidden-important');
+                document.getElementById('forcePasswordModal').classList.remove('hidden');
+            } else {
+                window.proceedToApp();
             }
         } else {
             document.getElementById('login-overlay').classList.remove('hidden-important');
@@ -921,6 +966,12 @@
             });
     });
 
+    window.skipPasswordChange = function() {
+        if (typeof window.proceedToApp === 'function') {
+            window.proceedToApp();
+        }
+    };
+
     window.handleLogout = function() {
         signOut(auth).then(() => { window.location.reload(); }).catch((error) => { console.error(error); });
     }
@@ -931,6 +982,7 @@
     let isEditMode = false;
     let isMovementMode = false;
     let currentFormType = 'PRIMER';
+    let currentUserRole = 'user';
     let activeTab = 'all';
     let activeStockSub = 'stock-primer'; 
     let currentPage = 1;
@@ -1148,8 +1200,8 @@
         });
         
         document.getElementById('th-actions').style.display = (t === 'all' || t === 'export') ? 'none' : 'table-cell';
-        const viewMapping = { 'all': 'list', 'stock': 'list', 'movement': 'list', 'storage': 'storage', 'export': 'list', 'history': 'history' };
-        ['list', 'storage', 'history'].forEach(vid => { document.getElementById('view-' + vid).classList.toggle('hidden', viewMapping[t] !== vid); });
+        const viewMapping = { 'all': 'list', 'stock': 'list', 'movement': 'list', 'storage': 'storage', 'export': 'list', 'history': 'history', 'admin': 'admin' };
+        ['list', 'storage', 'history', 'admin'].forEach(vid => { document.getElementById('view-' + vid).classList.toggle('hidden', viewMapping[t] !== vid); });
         
         document.getElementById('stock-sub-tabs').classList.toggle('hidden', t !== 'stock');
         document.getElementById('btn-export-excel').classList.toggle('hidden', t !== 'export');
@@ -1857,6 +1909,52 @@
         XLSX.utils.book_append_sheet(wb, ws, "LabData");
         XLSX.writeFile(wb, "LabData_Export.xlsx");
     };
+
+    window.openProfileModal = function() {
+        document.getElementById('profileName').value = document.getElementById('userNameDisplay').innerText;
+        document.getElementById('profileModal').classList.remove('hidden');
+        document.getElementById('profileModal').classList.add('flex');
+    };
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newName = document.getElementById('profileName').value;
+        try {
+            await setDoc(doc(db, 'users', auth.currentUser.email), { displayName: newName }, { merge: true });
+            document.getElementById('userNameDisplay').innerText = newName;
+            document.getElementById('profileModal').classList.add('hidden');
+            showToast("อัปเดตโปรไฟล์เรียบร้อย", "success");
+        } catch (error) { showToast("เกิดข้อผิดพลาด", "error"); console.error(error); }
+    });
+
+    document.getElementById('adminAddUserForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (currentUserRole !== 'admin') return alert("ไม่อนุญาตให้เข้าถึง (Access Denied)");
+        const email = document.getElementById('admin_newEmail').value;
+        const pass = document.getElementById('admin_newPass').value;
+        const name = document.getElementById('admin_newName').value;
+        const role = document.getElementById('admin_newRole').value;
+        
+        try {
+            // สร้างผู้ใช้ใหม่ด้วย Secondary App เพื่อไม่ให้ Admin หลักหลุดจากระบบ
+            await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+            
+            // บันทึกข้อมูลลง Firestore (ใช้ db หลัก)
+            await setDoc(doc(db, 'users', email), {
+                displayName: name,
+                role: role,
+                passwordChanged: false,
+                createdAt: new Date().toISOString()
+            });
+            
+            await signOut(secondaryAuth);
+            showToast("เพิ่มบัญชีผู้ใช้ใหม่สำเร็จ", "success");
+            document.getElementById('adminAddUserForm').reset();
+        } catch (error) {
+            console.error(error);
+            showToast("ไม่สามารถเพิ่มผู้ใช้ได้: " + error.message, "error");
+        }
+    });
 
     switchTab('all');
 
