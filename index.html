@@ -531,7 +531,7 @@
                                 <!-- Primer Specific -->
                                 <div id="group_primer" class="grid grid-cols-1 gap-3">
                                     <div><label class="flex justify-between items-center text-xs font-bold text-slate-600 mb-1">Forward <span id="fwd_counter" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">0 bp.</span></label><input type="text" name="forward" id="field_forward" readonly onclick="openSeqEditor('field_forward', 'Forward Sequence')" class="w-full rounded-lg border-slate-300 p-2.5 text-xs font-mono border outline-none cursor-pointer hover:bg-slate-50 placeholder-slate-400" placeholder="Click to edit..."></div>
-                                    <div><label class="flex justify-between items-center text-xs font-bold text-slate-600 mb-1">Reward <span id="rev_counter" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">0 bp.</span></label><input type="text" name="reverse" id="field_reverse" readonly onclick="openSeqEditor('field_reverse', 'Reverse Sequence')" class="w-full rounded-lg border-slate-300 p-2.5 text-xs font-mono border outline-none cursor-pointer hover:bg-slate-50 placeholder-slate-400" placeholder="Click to edit..."></div>
+                                    <div><label class="flex justify-between items-center text-xs font-bold text-slate-600 mb-1">Reward <span id="rev_counter" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">0 bp.</span></label><input type="text" name="Reward" id="field_Reward" readonly onclick="openSeqEditor('field_Reward', 'Reward Sequence')" class="w-full rounded-lg border-slate-300 p-2.5 text-xs font-mono border outline-none cursor-pointer hover:bg-slate-50 placeholder-slate-400" placeholder="Click to edit..."></div>
                                 </div>
                             </div>
 
@@ -1462,7 +1462,7 @@
         const go = document.getElementById('group_probe');
         if (type === 'PRIMER') { ln.innerText = "Primer Name"; go.classList.add('hidden'); gp.classList.remove('hidden'); }
         else { ln.innerText = "Probe Name"; gp.classList.add('hidden'); go.classList.remove('hidden'); }
-        updateBP('field_forward', 'fwd_counter'); updateBP('field_reverse', 'rev_counter'); updateBP('field_probe', 'probe_counter');
+        updateBP('field_forward', 'fwd_counter'); updateBP('field_Reward', 'rev_counter'); updateBP('field_probe', 'probe_counter');
     };
 
     window.updateBP = function(id, counterId) {
@@ -1504,7 +1504,7 @@
             
             // Trigger updateBP
             if(currentSeqTargetId === 'field_forward') updateBP('field_forward', 'fwd_counter');
-            if(currentSeqTargetId === 'field_reverse') updateBP('field_reverse', 'rev_counter');
+            if(currentSeqTargetId === 'field_Reward') updateBP('field_Reward', 'rev_counter');
             if(currentSeqTargetId === 'field_probe') updateBP('field_probe', 'probe_counter');
         }
         closeSeqEditor();
@@ -1556,7 +1556,7 @@
     };
 
     window.setFieldsStatus = function(isMovement) {
-        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_company', 'field_lotNumber', 'field_expiryDate', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel'];
+        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_Reward', 'field_company', 'field_lotNumber', 'field_expiryDate', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel'];
         all.forEach(id => {
             const el = document.getElementById(id) || document.getElementById(id.replace('field_', 'form_')); 
             if (!el) return;
@@ -1659,7 +1659,7 @@
             newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
         }
 
-        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reverse': 'Reverse', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'Reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
 
         try {
             if (curId) {
@@ -1834,7 +1834,7 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'Reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
         for (const [h, d] of Object.entries(map)) {
             const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
@@ -1859,7 +1859,7 @@
         });
         
         updateBP('field_forward', 'fwd_counter'); 
-        updateBP('field_reverse', 'rev_counter');
+        updateBP('field_Reward', 'rev_counter');
         updateBP('field_probe', 'probe_counter');
     };
 
@@ -2018,7 +2018,7 @@
             slotDetailHtml += `</div></div>`;
         }
 
-        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', reverse: 'Reverse', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', box: 'Box', reference: 'Reference' };
+        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', Reward: 'Reward', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', box: 'Box', reference: 'Reference' };
         document.getElementById('modalPrimerName').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
@@ -2027,7 +2027,7 @@
             else if (!val) val = '-';
             
             // Add logic for bp count in Detail view
-            if (['forward', 'reverse', 'probe'].includes(k) && val !== '-') {
+            if (['forward', 'Reward', 'probe'].includes(k) && val !== '-') {
                 val = `<div class="break-all font-mono text-xs">${val}</div><div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold border border-slate-200">${val.replace(/<[^>]*>?/gm, '').length} bp.</span></div>`;
             } else {
                 val = `<div class="font-medium text-slate-800">${val}</div>`;
