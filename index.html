@@ -565,18 +565,16 @@
             <!-- NEW DASHBOARD SECTION -->
             <div id="dashboard-stats" class="hidden">
                 <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-                    <!-- Stock Items -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-2">
-                        <div class="p-3 rounded-full bg-teal-50 text-teal-600">
+                                        <div class="bg-brand-700 p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-2">
+                        <div class="p-3 rounded-full bg-white text-brand-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                             </svg>
                         </div>
-                        <span id="dash-stock-count" class="text-3xl font-extrabold text-slate-800">0</span>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Stock Items</span>
+                        <span id="dash-stock-count" class="text-3xl font-extrabold text-white">0</span>
+                        <span class="text-[10px] font-bold text-brand-100 uppercase tracking-widest">Stock Items</span>
                     </div>
-                    <!-- Low Level -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-2">
+                                        <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-cyan-500 shadow-sm flex flex-col items-center justify-center gap-2">
                         <div class="p-3 rounded-full bg-cyan-50 text-cyan-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -585,8 +583,7 @@
                         <span id="dash-low-count" class="text-3xl font-extrabold text-slate-800">0</span>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Low Level</span>
                     </div>
-                    <!-- Out of Stock -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-2">
+                                        <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-red-500 shadow-sm flex flex-col items-center justify-center gap-2">
                         <div class="p-3 rounded-full bg-red-50 text-red-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
