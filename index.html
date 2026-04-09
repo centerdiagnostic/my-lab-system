@@ -308,6 +308,27 @@
             </svg>
             <h1 class="brand-title">NEXUS BIO</h1>
             <p class="brand-subtitle">Lab Data Management System</p>
+            
+                        <div id="mascot-container" style="margin-top: 2rem; position: relative; width: 12rem; height: 12rem; margin-left: auto; margin-right: auto; filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.03)) drop-shadow(0 8px 5px rgba(0, 0, 0, 0.08)); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; overflow: visible;">
+                                        <path id="mascot-body" d="M40 180 C 40 70, 160 70, 160 180 Z" fill="#ccfbf1" style="transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);" />
+                    
+                                        <g id="mascot-eyes" style="transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);">
+                        <circle cx="80" cy="120" r="9" fill="#0f766e" />
+                        <circle cx="120" cy="120" r="9" fill="#0f766e" />
+                                                <circle cx="77" cy="117" r="2.5" fill="#f0fdfa" opacity="0.8" />
+                        <circle cx="117" cy="117" r="2.5" fill="#f0fdfa" opacity="0.8" />
+                    </g>
+                    
+                                        <path id="mascot-mouth" d="M 85 140 Q 100 142, 115 140" stroke="#0f766e" stroke-width="2.5" fill="none" stroke-linecap="round" style="transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);" />
+                    
+                                        <g id="mascot-hands" style="transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); transform-origin: bottom; transform: translateY(50px); opacity: 0;">
+                        <path d="M 50 180 C 50 120, 95 110, 95 140" stroke="#5eead4" stroke-width="16" fill="none" stroke-linecap="round" />
+                        <path d="M 150 180 C 150 120, 105 110, 105 140" stroke="#5eead4" stroke-width="16" fill="none" stroke-linecap="round" />
+                    </g>
+                </svg>
+            </div>
+
             <div class="brand-footer">
                 <p class="brand-footer-text">Secure Access Portal</p>
                 <div class="brand-footer-line"></div>
@@ -477,7 +498,7 @@
                                 <h3 class="text-xs font-bold text-brand-700 uppercase tracking-widest border-b border-brand-100 pb-2 mb-4">General Information</h3>
                                 
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Date Ordered <span class="text-red-500">*</span></label><input type="date" name="orderDate" id="field_orderDate" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 border outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Animal Type <span class="text-red-500">*</span></label><select name="animalType" id="field_animalType" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none bg-white"><option value="">Select Type...</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option></select></div>
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Animal Type <span class="text-red-500">*</span></label><select name="animalType" id="field_animalType" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none bg-white"><option value="">Select Type...</option><option value="Swine">Swine</option><option value="Aquatic">Aquatic</option><option value="Wildlife">Wildlife</option><option value="Pets">Pets</option><option value="Exotic pets">Exotic pets</option><option value="Large Animals">Large Animals</option><option value="Avian">Avian</option></select></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Species</label><input type="text" name="species" id="field_species" list="list_species" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Disease Name <span class="text-red-500">*</span></label><input type="text" name="disease" id="field_disease" list="list_disease" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Company Name</label><input type="text" name="company" id="field_company" list="list_company" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
@@ -946,16 +967,136 @@
 
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
     const loginPasswordInput = document.getElementById('loginPassword');
+    const loginEmailInput = document.getElementById('loginEmail');
     const eyeIconSvg = document.getElementById('eyeIconSvg');
+    
+    const mascotEyes = document.getElementById('mascot-eyes');
+    const mascotHands = document.getElementById('mascot-hands');
+    const mascotMouth = document.getElementById('mascot-mouth'); 
+    const mascotBody = document.getElementById('mascot-body'); 
+    const mascotContainer = document.getElementById('mascot-container');
+    let isMascotBusy = false; // ตัวแปรเช็คสถานะว่ากำลังโฟกัสช่องพิมพ์อยู่หรือไม่
+
+    // ฟังก์ชันให้มาสคอตมองตามเมาส์ (Mouse Tracking)
+    document.addEventListener('mousemove', (e) => {
+        if (isMascotBusy || !mascotContainer) return; // ถ้ายุ่งอยู่ (กำลังพิมพ์) ให้ข้ามไป
+        
+        const rect = mascotContainer.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const deltaX = e.clientX - centerX;
+        const deltaY = e.clientY - centerY;
+        const angle = Math.atan2(deltaY, deltaX);
+        
+        // คำนวณระยะการขยับตาและตัว (สูงสุด 12px สำหรับตา)
+        const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 0.03, 12);
+        const moveX = Math.cos(angle) * distance;
+        const moveY = Math.sin(angle) * distance;
+
+        mascotEyes.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        
+        // ให้ตัวเอียงตามเมาส์นิดๆ ด้วย
+        const bodyMove = moveX * 0.5;
+        mascotBody.setAttribute('d', `M${40 - bodyMove} 180 C 40 70, 160 70, ${160 - bodyMove} 180 Z`);
+    });
+
+    // 1. ฟังก์ชันกรอกอีเมล (กลอกตาและใบหน้าทั้งหมด)
+    loginEmailInput.addEventListener('focus', () => {
+        isMascotBusy = true;
+        mascotHands.style.transform = 'translateY(50px)';
+        mascotHands.style.opacity = '0';
+        mascotEyes.style.transform = 'translate(-8px, 10px)'; // move eyes/Sparkles
+        
+        // Pliant Body morph: squash/stretch
+        mascotBody.setAttribute('d', "M40 180 C 45 65, 155 65, 160 180 Z"); // morph to squashed
+
+        // Mouth morph: squash/stretch + rotate
+        mascotMouth.setAttribute('d', "M 88 138 Q 99 140, 110 138"); // morph to squashed
+    });
+    
+    loginEmailInput.addEventListener('input', (e) => {
+        let len = e.target.value.length;
+        let moveX = Math.min(len - 8, 12); // กลอกตาซ้ายไปขวา
+        mascotEyes.style.transform = `translate(${moveX}px, 10px)`; // move eyes/Sparkles
+        
+        // Face pliant movement: morph body with eyes
+        let bodyMoveX = Math.min(len * 0.1, 1);
+        mascotBody.setAttribute('d', `M${40-bodyMoveX} 180 C ${40} 70, ${160+bodyMoveX} 70, ${160+bodyMoveX} 180 Z`); // morph body
+    });
+
+    loginEmailInput.addEventListener('blur', () => {
+        isMascotBusy = false;
+        mascotEyes.style.transform = 'translate(0px, 0px)';
+        mascotBody.setAttribute('d', "M40 180 C 40 70, 160 70, 160 180 Z"); // restore body
+        mascotMouth.setAttribute('d', "M 85 140 Q 100 142, 115 140"); // restore mouth
+    });
+
+    // 2. ฟังก์ชันกรอกรหัสผ่าน (ยกมือปิดตา)
+    loginPasswordInput.addEventListener('focus', () => {
+        isMascotBusy = true;
+        if (loginPasswordInput.getAttribute('type') === 'password') {
+            // Close eyes
+            mascotEyes.style.transform = 'translate(0px, -5px)';
+            
+            // Bring hands up and pliant morph
+            mascotHands.style.transform = 'translateY(-15px)';
+            mascotHands.style.opacity = '1';
+
+            // Mouth morph: squash + rotate to face hands
+            mascotMouth.setAttribute('d', "M 82 142 Q 97 144, 112 142"); // morph mouth to squash
+
+            // Body pliant morph: squash and tilt towards hands
+            mascotBody.setAttribute('d', "M45 180 C 50 60, 150 65, 155 180 Z"); // morph body to squashed
+        }
+    });
+
+    loginPasswordInput.addEventListener('blur', () => {
+        isMascotBusy = false;
+        mascotHands.style.transform = 'translateY(50px)';
+        mascotHands.style.opacity = '0';
+        
+        // Open eyes and pliant morph back
+        mascotEyes.style.transform = 'translate(0px, 0px)';
+        mascotMouth.setAttribute('d', "M 85 140 Q 100 142, 115 140"); // restore mouth
+        mascotBody.setAttribute('d', "M40 180 C 40 70, 160 70, 160 180 Z"); // restore body
+    });
 
     togglePasswordBtn.addEventListener('click', () => {
         const isPassword = loginPasswordInput.getAttribute('type') === 'password';
         loginPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        
         if (isPassword) {
+            // Show password (แอบดู)
             eyeIconSvg.innerHTML = `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>`;
+            
+            // Lower hands, still open eyes
+            mascotHands.style.transform = 'translateY(30px)'; // เอามือลง
+            mascotHands.style.opacity = '0.5';
+            mascotEyes.style.transform = 'translate(0px, 5px)'; // มองรหัส
+            
+            // Body squash further (แอบดู)
+            mascotBody.setAttribute('d', "M50 180 C 55 55, 145 60, 150 180 Z"); // morph body to further squashed
+
+            // Mouth morph: squash further
+            mascotMouth.setAttribute('d', "M 80 144 Q 95 146, 110 144"); // morph mouth to squashed
+
         } else {
+            // Hide password (ปิดตาเหมือนเดิม)
             eyeIconSvg.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>`;
+            
+            // Hands up, close eyes
+            mascotHands.style.transform = 'translateY(-15px)';
+            mascotHands.style.opacity = '1';
+            mascotEyes.style.transform = 'translate(0px, -5px)';
+
+            // Body squash back
+            mascotBody.setAttribute('d', "M45 180 C 50 60, 150 65, 155 180 Z"); // restore body to squash
+
+            // Mouth morph: squash back
+            mascotMouth.setAttribute('d', "M 82 142 Q 97 144, 112 142"); // restore mouth to squash
         }
+        loginPasswordInput.focus();
     });
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
