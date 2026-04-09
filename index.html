@@ -11,6 +11,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -480,6 +481,8 @@
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Species</label><input type="text" name="species" id="field_species" list="list_species" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Disease Name <span class="text-red-500">*</span></label><input type="text" name="disease" id="field_disease" list="list_disease" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Company Name</label><input type="text" name="company" id="field_company" list="list_company" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Lot / Batch No.</label><input type="text" name="lotNumber" id="field_lotNumber" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Expiration Date</label><input type="date" name="expiryDate" id="field_expiryDate" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></div>
                                 <div><label class="block text-xs font-bold text-slate-600 mb-1">Reference</label><textarea name="reference" id="field_reference" rows="2" class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none"></textarea></div>
                             </div>
 
@@ -1125,6 +1128,16 @@
             const isLow = vol <= low && low > 0;
             const volColorClass = (vol === 0) ? 'bg-slate-200 text-slate-500' : (isLow ? 'low-level-pulse border-red-400' : 'bg-emerald-50 text-emerald-700 border border-emerald-100');
 
+            let expBadge = '';
+            if(item.expirydate) {
+                const exp = new Date(item.expirydate);
+                const today = new Date();
+                const diffTime = exp - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if(diffDays < 0) expBadge = '<span class="text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded block mt-1 w-max border border-red-200">Expired</span>';
+                else if(diffDays <= 90) expBadge = `<span class="text-[8px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded block mt-1 w-max border border-orange-200">Exp in ${diffDays}d</span>`;
+            }
+
             let actionBtns = '';
             if (activeTab === 'movement') {
                 if (parseFloat(item.volume) === 0) {
@@ -1152,7 +1165,7 @@
                 <td class="px-4 py-3 text-slate-700 text-center text-[10px] font-semibold whitespace-nowrap">${formatDateOnly(item.orderdate)}</td>
                 <td class="px-4 py-3 text-slate-500 text-center font-mono text-[10px]">${displayID}</td>
                 <td class="px-4 py-3 text-center"><span class="badge badge-gray text-[9px] border border-slate-200">${item.animaltype || '-'}</span></td>
-                <td class="px-4 py-3 font-semibold text-brand-800">${item.primername || '-'} <span class="text-[10px] text-slate-400 font-normal block">${item.species || ''}</span></td>
+                <td class="px-4 py-3 font-semibold text-brand-800">${item.primername || '-'} <span class="text-[10px] text-slate-400 font-normal block">${item.species || ''}</span>${expBadge}</td>
                 <td class="px-4 py-3 text-center whitespace-nowrap"><span class="badge ${boxSlotStyle} border text-[10px] font-mono">${boxSlotDisplay}</span></td>
                 <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${volColorClass}">${displayVol || 0}</span></td>
                 ${(activeTab !== 'all' && activeTab !== 'export') ? `<td class="px-4 py-3 text-right" onclick="event.stopPropagation();">${actionBtns}</td>` : ''}
@@ -1402,7 +1415,7 @@
     };
 
     window.setFieldsStatus = function(isMovement) {
-        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_company', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel'];
+        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_reverse', 'field_company', 'field_lotNumber', 'field_expiryDate', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel'];
         all.forEach(id => {
             const el = document.getElementById(id) || document.getElementById(id.replace('field_', 'form_')); 
             if (!el) return;
@@ -1505,7 +1518,7 @@
             newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
         }
 
-        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reverse': 'Reverse', 'company': 'Company', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reverse': 'Reverse', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
 
         try {
             if (curId) {
@@ -1680,7 +1693,7 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'reverse': 'reverse', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel' };
         for (const [h, d] of Object.entries(map)) {
             const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
@@ -1864,7 +1877,7 @@
             slotDetailHtml += `</div></div>`;
         }
 
-        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', reverse: 'Reverse', company: 'Company', ta: 'TA', productsize: 'Size', box: 'Box', reference: 'Reference' };
+        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', reverse: 'Reverse', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', box: 'Box', reference: 'Reference' };
         document.getElementById('modalPrimerName').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
@@ -1883,8 +1896,25 @@
         }).join('');
         content += slotDetailHtml;
 
+        // ส่วนของ QR Code
+        content += `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center mt-2">
+            <span class="text-xs font-bold text-slate-600 mb-2">Item QR Code</span>
+            <div id="qrcode-box" class="bg-white p-2 rounded-lg border shadow-sm"></div>
+            <span class="text-[10px] text-slate-400 mt-2 font-mono">${item.id}</span>
+        </div>`;
+
         document.getElementById('modalContent').innerHTML = content;
         document.getElementById('detailModal').classList.remove('hidden'); document.getElementById('detailModal').classList.add('flex');
+        
+        setTimeout(() => {
+            document.getElementById('qrcode-box').innerHTML = "";
+            new QRCode(document.getElementById('qrcode-box'), {
+                text: "NEXUS-BIO-ITEM:" + item.id,
+                width: 120, height: 120,
+                colorDark : "#0f172a", colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+            });
+        }, 100);
     };
 
     window.closeModal = function() { document.getElementById('detailModal').classList.add('hidden'); };
