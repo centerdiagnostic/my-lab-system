@@ -427,7 +427,7 @@
         <div class="flex items-center gap-4">
             <button id="navAdminBtn" onclick="switchTab('admin')" class="hidden hidden-important text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg font-bold shadow hover:bg-slate-900 transition-colors">⚙️ จัดการผู้ใช้</button>
             <div class="hidden md:flex flex-col items-end cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors" onclick="openProfileModal()">
-                <span id="usecDNAmeDisplay" class="text-sm font-bold text-slate-700">Loading...</span>
+                <span id="userNameDisplay" class="text-sm font-bold text-slate-700">Loading...</span>
                 <span id="userRoleDisplay" class="text-[10px] text-brand-600 font-bold uppercase">User</span>
             </div>
             <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="ออกจากระบบ">
@@ -870,7 +870,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">ชื่อ-นามสกุล</label>
-                        <input type="text" id="editUsecDNAme" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="edituserName" required class="w-full rounded-lg border-slate-300 p-2.5 text-sm border outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">ระดับสิทธิ์ (Role)</label>
@@ -912,7 +912,7 @@
             <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
             <div class="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl flex flex-col shadow-2xl animate-in zoom-in-95 overflow-hidden">
                 <div class="flex justify-between items-center p-6 border-b bg-slate-50">
-                    <h2 id="modalPrimecDNAme" class="font-bold text-lg text-brand-800 uppercase tracking-tight">Report Details</h2>
+                    <h2 id="modalprimername" class="font-bold text-lg text-brand-800 uppercase tracking-tight">Report Details</h2>
                     <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
                 </div>
                 <div id="modalContent" class="overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm bg-white custom-scrollbar"></div>
@@ -995,7 +995,7 @@
         "staff@lab.com": "Nong Ploy",
     };
 
-    function getUsecDNAme(email) {
+    function getuserName(email) {
         return USER_MAPPING[email] || email; 
     }
 
@@ -1012,8 +1012,8 @@
                 document.getElementById('login-overlay').classList.add('hidden-important');
                 document.getElementById('wp-lab-app-container').classList.remove('hidden-important');
                 
-                const displayName = userData.displayName || getUsecDNAme(user.email);
-                document.getElementById('usecDNAmeDisplay').innerText = displayName;
+                const displayName = userData.displayName || getuserName(user.email);
+                document.getElementById('userNameDisplay').innerText = displayName;
                 
                 let roleDisplay = 'User';
                 if (currentUserRole === 'superadmin') roleDisplay = 'Super Admin';
@@ -1105,9 +1105,8 @@
     const mascotContainer = document.getElementById('mascot-container');
     let isMascotBusy = false; // ตัวแปรเช็คสถานะว่ากำลังโฟกัสช่องพิมพ์อยู่หรือไม่
 
-    // ฟังก์ชันให้มาสคอตมองตามเมาส์ (Mouse Tracking)
     document.addEventListener('mousemove', (e) => {
-        if (isMascotBusy || !mascotContainer) return; // ถ้ายุ่งอยู่ (กำลังพิมพ์) ให้ข้ามไป
+        if (isMascotBusy || !mascotContainer || mascotContainer.offsetParent === null) return; // ถ้ายุ่งอยู่ หรือถูกซ่อนอยู่ ให้ข้ามไป
         
         const rect = mascotContainer.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -1314,8 +1313,9 @@
         
         // นับ DNA/cDNA
         const d_stock = dataList.filter(i => { 
-            const t = (i.itemtype || '').toUpperCase(); 
-            return !i.isoutofstock && (t === 'DNA' || t === 'cDNA'); 
+            let t = (i.itemtype || '').toUpperCase(); 
+            if (t === 'DNA' || t === 'CDNA') t = (i.folderno || t).toUpperCase();
+            return !i.isoutofstock && (t === 'DNA' || t === 'CDNA'); 
         }).length;
         
         // นับ Out of stock และ Low Level รวมทั้งหมด
@@ -1331,7 +1331,7 @@
     window.saveHistoryLog = async function(action, name, details = []) {
         if (!auth.currentUser) return;
         const userEmail = auth.currentUser.email;
-        const usecDNAme = getUsecDNAme(userEmail);
+        const userName = getuserName(userEmail);
         try {
             // สร้างวันที่แบบ วัน-เดือน-ปี เวลา.นาที เพื่อใช้เป็นชื่อ ID
             const now = new Date();
@@ -1350,7 +1350,7 @@
                 action: action, 
                 name: name, 
                 details: details, 
-                by: usecDNAme, 
+                by: userName, 
                 email: userEmail 
             });
         } catch (e) { console.error("Error saving log:", e); }
@@ -1441,7 +1441,7 @@
                     actionBtns = `<div class="flex justify-end gap-1">
                         <button onclick="copyItem('${item.id}')" class="btn-action" title="Copy"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
                         <button onclick="openEditMode('${item.id}')" class="btn-action" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                        <button onclick="openDeleteModal('${item.id}', '${item.primecDNAme}')" class="btn-action text-red-400 hover:text-red-600" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                        <button onclick="openDeleteModal('${item.id}', '${item.primername}')" class="btn-action text-red-400 hover:text-red-600" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                     </div>`;
                 } else {
                     actionBtns = `<span class="text-[10px] text-slate-400">View Only</span>`;
@@ -1491,14 +1491,18 @@
         
         filteredList = dataList.filter(item => {
             // บังคับแปลงตัวพิมพ์ใหญ่เสมอเพื่อป้องกันบัคข้อมูลเก่า
-            const type = (item.itemtype || 'PRIMER').toUpperCase(); 
+            let type = (item.itemtype || 'PRIMER').toUpperCase(); 
+            // หากเป็นกลุ่ม DNA ให้ใช้ข้อมูลจาก dropdown (folderno) ช่วยจำแนกแท็บย่อยให้แม่นยำ
+            if (type === 'DNA' || type === 'CDNA') {
+                type = (item.folderno || type).toUpperCase();
+            }
             
             // ในหน้า Dashboard ให้โชว์รวม "ทั้งหมด" ไม่ต้อง return false
             if(currentAppMode !== 'DASHBOARD') {
                 if(currentAppMode === 'PRIMER_PROBE' && type !== 'PRIMER' && type !== 'PROBE') return false;
-                if(currentAppMode === 'DNA_cDNA' && type !== 'DNA' && type !== 'cDNA') return false;
+                if(currentAppMode === 'DNA_cDNA' && type !== 'DNA' && type !== 'CDNA') return false;
             }
-            if(currentAppMode === 'DNA_cDNA' && type !== 'DNA' && type !== 'cDNA') return false;
+            if(currentAppMode === 'DNA_cDNA' && type !== 'DNA' && type !== 'CDNA') return false;
 
             if (activeTab === 'all' || activeTab === 'export') {
                 if (fStat === 'in' && item.isoutofstock) return false;
@@ -1511,7 +1515,7 @@
                     if (activeStockSub === 'stock-probe' && type !== 'PROBE') return false;
                     if (activeStockSub === 'stock-primer' && type !== 'PRIMER') return false;
                     if (activeStockSub === 'stock-dna' && type !== 'DNA') return false;
-                    if (activeStockSub === 'stock-cDNA' && type !== 'cDNA') return false;
+                    if (activeStockSub === 'stock-cDNA' && type !== 'CDNA') return false;
                 }
             } else if (activeTab === 'movement') { if (item.isoutofstock) return false; }
 
@@ -1782,7 +1786,9 @@
     };
 
     window.setFieldsStatus = function(isMovement) {
-        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primecDNAme', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_Reward', 'field_company', 'field_lotNumber', 'field_expiryDate', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel', 'field_sampleType', 'field_folderNo', 'field_result', 'field_seqResult', 'field_remark']; all.forEach(id => {     const el = document.getElementById(id) || document.getElementById(id.replace('field_', 'form_')); 
+        const all = ['field_orderDate', 'field_animalType', 'field_species', 'field_disease', 'field_primerName', 'field_originalName', 'field_probe', 'field_fluorescent', 'field_targetGene', 'field_method', 'field_forward', 'field_Reward', 'field_company', 'field_lotNumber', 'field_expiryDate', 'field_ta', 'field_productSize', 'field_box', 'field_usageCount', 'field_reference', 'field_lowLevel', 'field_sampleType', 'field_folderNo', 'field_result', 'field_seqResult', 'field_remark']; 
+        all.forEach(id => {     
+            const el = document.getElementById(id) || document.getElementById(id.replace('field_', 'form_')); 
             if (!el) return;
             const isAllowedInMovement = ['field_usedAmount'].includes(id); 
             const isEditable = !isMovement || isAllowedInMovement;
@@ -1816,25 +1822,9 @@
         let requiredFields = [];
         
         if (type === 'PRIMER' || type === 'PROBE') {
-            requiredFields = [
-                { id: 'field_orderDate', label: 'Date Ordered' },
-                { id: 'field_animalType', label: 'Animal Type' },
-                { id: 'field_disease', label: 'Disease Name' },
-                { id: 'field_primecDNAme', label: 'Name' },
-                { id: 'field_method', label: 'Method' },
-                { id: 'form_box', label: 'Box Name' },
-                { id: 'field_lowLevel', label: 'Low Level Alert' }
-            ];
+            requiredFields = [{ id: 'field_orderDate', label: 'Date Ordered' },{ id: 'field_animalType', label: 'Animal Type' },{ id: 'field_disease', label: 'Disease Name' },{ id: 'field_primerName', label: 'Name' },{ id: 'field_method', label: 'Method' },{ id: 'form_box', label: 'Box Name' },{ id: 'field_lowLevel', label: 'Low Level Alert' }];
         } else {
-            requiredFields = [
-                { id: 'field_orderDate', label: 'Date of collected' },
-                { id: 'field_animalType', label: 'Animal Type' },
-                { id: 'field_sampleType', label: 'Type of Samples' },
-                { id: 'field_disease', label: 'Disease Name' },
-                { id: 'field_primecDNAme', label: 'Folder no./OPD/Name' },
-                { id: 'field_folderNo', label: 'Nucleic Acid Type' },
-                { id: 'form_box', label: 'Box Name' }
-            ];
+            requiredFields = [{ id: 'field_orderDate', label: 'Date of collected' },{ id: 'field_animalType', label: 'Animal Type' },{ id: 'field_sampleType', label: 'Type of Samples' },{ id: 'field_disease', label: 'Disease Name' },{ id: 'field_primerName', label: 'Folder no./OPD/Name' },{ id: 'field_folderNo', label: 'Nucleic Acid Type' },{ id: 'form_box', label: 'Box Name' }];
         }
         
         let missing = [];
@@ -1856,7 +1846,7 @@
         if(!hasSlot) missing.push("Slot");
 
         if (missing.length > 0) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน:\n- " + missing.join("\n- "));
+            showToast("กรุณากรอกข้อมูลให้ครบถ้วน:<br>- " + missing.join("<br>- "), "error");
             return;
         }
 
@@ -1908,6 +1898,12 @@
         }
         
         newItem.slot = newItem.slot.join(', ');
+        
+        // ปรับ ItemType ให้ตรงกับประเภทที่เลือกใน Dropdown เพื่อป้องกันข้อมูลไปผิดแท็บ
+        if (type === 'DNA' || type === 'cDNA' || type === 'CDNA') {
+            newItem.itemtype = newItem.folderno || 'DNA';
+        }
+
         // Recalculate total volume just in case
         if(!isMovementMode) calculateTotalVolume();
         newItem.volume = parseFloat(document.getElementById('field_volume').value || 0);
@@ -1921,7 +1917,7 @@
             newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
         }
 
-        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primecDNAme': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'Reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'Reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
 
         try {
             if (curId) {
@@ -2098,7 +2094,9 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primecDNAme': 'primecDNAme', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'Reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; for (const [h, d] of Object.entries(map)) {    const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'Reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; 
+        for (const [h, d] of Object.entries(map)) {    
+            const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
                 let val = item[d] || "";
                 if (h === 'orderDate' && val) try { val = new Date(val).toISOString().split('T')[0]; } catch(e) {}
@@ -2223,20 +2221,23 @@
         
         Object.entries(filterMap).forEach(([k, selectId]) => {
             const sel = document.getElementById(selectId); if (!sel) return;
-            const currentVal = sel.value; // เก็บค่าที่เลือกไว้ก่อนหน้า
+            const currentVal = sel.value; 
+            // ดึงค่าไม่ซ้ำจากข้อมูล
             const u = [...new Set(items.map(i => i[k]))].filter(Boolean).sort();
             let html = `<option value="">${defaultText[k]}</option>`;
             html += u.map(val => `<option value="${val}">${val}</option>`).join('');
             sel.innerHTML = html;
-            sel.value = currentVal; // เซ็ตค่ากลับไปเพื่อไม่ให้ filter เด้งหลุดตอนพิมพ์
+            sel.value = currentVal; 
         });
     };
 
     window.updateBoxOptions = function(items) {
         const modeItems = items.filter(i => {
-            const t = i.itemtype || 'PRIMER';
+            let t = (i.itemtype || 'PRIMER').toUpperCase();
+            if (t === 'DNA' || t === 'CDNA') t = (i.folderno || t).toUpperCase();
+            
             if(currentAppMode === 'PRIMER_PROBE') return t === 'PRIMER' || t === 'PROBE';
-            if(currentAppMode === 'DNA_cDNA') return t === 'DNA' || t === 'cDNA';
+            if(currentAppMode === 'DNA_cDNA') return t === 'DNA' || t === 'CDNA';
             return true;
         });
         const boxes = [...new Set(modeItems.map(i => i.box).filter(Boolean))].sort();
@@ -2255,9 +2256,16 @@
         const icon = t==='success' ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
         el.innerHTML = `${icon} <div>${m}</div>`;
         overlay.appendChild(el);
-        document.body.appendChild(overlay);
+        
+        const container = document.getElementById('wp-lab-app-container');
+        if (container && !container.classList.contains('hidden-important')) {
+            container.appendChild(overlay);
+        } else {
+            document.body.appendChild(overlay);
+        }
+        
         setTimeout(() => { 
-            if (document.body.contains(overlay)) {
+            if (overlay.parentNode) {
                 overlay.classList.add('fade-out', 'slide-out-to-right-10');
                 setTimeout(() => overlay.remove(), 300);
             }
@@ -2307,27 +2315,24 @@
         }
 
         const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', Reward: 'Reward', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
-        document.getElementById('modalPrimerName').innerText = item.primername;
+        document.getElementById('modalprimername').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
             let val = item[k];
             if (k === 'orderdate') val = formatDateFull(val);
-            else if (!val) val = '-';
-            
-            // Add logic for bp count in Detail view
+            else if (val === undefined || val === null || val === '') val = '-';
             if (['forward', 'Reward', 'probe'].includes(k) && val !== '-') {
-                val = `<div class="break-all font-mono text-xs">${val}</div><div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold border border-slate-200">${val.replace(/<[^>]*>?/gm, '').length} bp.</span></div>`;
+                val = `<div class="break-all font-mono text-xs" style="color:#1e293b;">${val}</div><div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold border border-slate-200">${String(val).replace(/<[^>]*>?/gm, '').length} bp.</span></div>`;
             } else if (k === 'attachmentname' && val !== '-') {
                 if (item.attachmentbase64) {
-                    val = `<div class="font-medium text-brand-600 hover:text-brand-800 underline truncate"><a href="${item.attachmentbase64}" download="${val}">${val}</a></div>`;
+                    val = `<div class="font-medium underline truncate" style="color:#0284c7;"><a href="${item.attachmentbase64}" download="${val}">${val}</a></div>`;
                 } else {
-                    val = `<div class="font-medium text-slate-800">${val}</div>`;
+                    val = `<div class="font-medium" style="color:#1e293b;">${val}</div>`;
                 }
             } else {
-                val = `<div class="font-medium text-slate-800">${val}</div>`;
+                val = `<div class="font-medium" style="color:#1e293b;">${val}</div>`;
             }
-            
-            return `<div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">${lbl}</span>${val}</div>`;
+            return `<div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col justify-center min-h-[64px]"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">${lbl}</span>${val}</div>`;
         }).join('');
         content += slotDetailHtml;
 
@@ -2393,7 +2398,7 @@
     };
 
     window.openProfileModal = function() {
-        document.getElementById('profileName').value = document.getElementById('usecDNAmeDisplay').innerText;
+        document.getElementById('profileName').value = document.getElementById('userNameDisplay').innerText;
         document.getElementById('profileModal').classList.remove('hidden');
         document.getElementById('profileModal').classList.add('flex');
     };
@@ -2403,7 +2408,7 @@
         const newName = document.getElementById('profileName').value;
         try {
             await setDoc(doc(db, 'users', auth.currentUser.email), { displayName: newName }, { merge: true });
-            document.getElementById('usecDNAmeDisplay').innerText = newName;
+            document.getElementById('userNameDisplay').innerText = newName;
             document.getElementById('profileModal').classList.add('hidden');
             showToast("อัปเดตโปรไฟล์เรียบร้อย", "success");
         } catch (error) { showToast("เกิดข้อผิดพลาด", "error"); console.error(error); }
@@ -2469,7 +2474,7 @@
 
     window.openEditUserModal = function(email, name, role) {
         document.getElementById('editUserEmail').value = email;
-        document.getElementById('editUsecDNAme').value = name;
+        document.getElementById('edituserName').value = name;
         document.getElementById('editUserRole').value = role;
         document.getElementById('editUserModal').classList.remove('hidden');
         document.getElementById('editUserModal').classList.add('flex');
@@ -2484,7 +2489,7 @@
         e.preventDefault();
         if (currentUserRole !== 'superadmin') return;
         const email = document.getElementById('editUserEmail').value;
-        const name = document.getElementById('editUsecDNAme').value;
+        const name = document.getElementById('edituserName').value;
         const role = document.getElementById('editUserRole').value;
 
         if (email === auth.currentUser.email && role !== 'superadmin') {
