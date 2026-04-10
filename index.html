@@ -986,7 +986,8 @@
     const db = getFirestore(app);
     const auth = getAuth(app); 
     const COLLECTION_NAME = "lab_items"; 
-    const LOGS_COLLECTION = "activity_logs"; 
+    const LOGS_COLLECTION_PRIMER = "activity_logs_primer"; 
+    const LOGS_COLLECTION_DNA = "activity_logs_dna"; 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
     // --- USER MANAGEMENT ---
@@ -1277,7 +1278,8 @@
     let currentPage = 1;
     let rowsPerPage = 10;
     let activeSlotInput = null;
-    let onlineLogs = [];
+    let onlineLogsPrimer = [];
+    let onlineLogsDNA = [];
     let historyCurrentPage = 1;
     const historyRowsPerPage = 10;
     let currentSeqTargetId = null; 
@@ -1297,10 +1299,16 @@
             filterTable(); updateFilterSuggestions(dataList); updateBoxOptions(dataList); updateDashboard();
         }, (error) => { console.error("Error fetching DNA data: ", error); });
 
-        const q = query(collection(db, LOGS_COLLECTION), orderBy("ts", "desc"), limit(200));
-        onSnapshot(q, (snapshot) => {
-            onlineLogs = snapshot.docs.map(doc => doc.data());
-            renderHistory();
+        const qPrimer = query(collection(db, LOGS_COLLECTION_PRIMER), orderBy("ts", "desc"), limit(200));
+        onSnapshot(qPrimer, (snapshot) => {
+            onlineLogsPrimer = snapshot.docs.map(doc => doc.data());
+            if (currentAppMode !== 'DNA_cDNA') renderHistory();
+        });
+
+        const qDNA = query(collection(db, LOGS_COLLECTION_DNA), orderBy("ts", "desc"), limit(200));
+        onSnapshot(qDNA, (snapshot) => {
+            onlineLogsDNA = snapshot.docs.map(doc => doc.data());
+            if (currentAppMode === 'DNA_cDNA' || currentAppMode === 'DASHBOARD') renderHistory();
         });
     };
 
@@ -1328,7 +1336,7 @@
         if(document.getElementById('dash-out-count')) document.getElementById('dash-out-count').innerText = out;
     };
 
-    window.saveHistoryLog = async function(action, name, details = []) {
+    window.saveHistoryLog = async function(action, name, details = [], itemType = null) {
         if (!auth.currentUser) return;
         const userEmail = auth.currentUser.email;
         const userName = getuserName(userEmail);
@@ -1344,8 +1352,13 @@
             
             const customLogID = `${day}-${month}-${year} ${hours}.${minutes}.${seconds}`;
 
+            let targetLogCol = LOGS_COLLECTION_PRIMER;
+            if (itemType === 'DNA' || itemType === 'cDNA' || itemType === 'CDNA') targetLogCol = LOGS_COLLECTION_DNA;
+            else if (itemType === 'PRIMER' || itemType === 'PROBE') targetLogCol = LOGS_COLLECTION_PRIMER;
+            else if (currentAppMode === 'DNA_cDNA') targetLogCol = LOGS_COLLECTION_DNA;
+
             // เปลี่ยนจาก addDoc เป็น setDoc เพื่อกำหนด ID เอง
-            await setDoc(doc(db, LOGS_COLLECTION, customLogID), { 
+            await setDoc(doc(db, targetLogCol, customLogID), { 
                 ts: new Date().toISOString(), 
                 action: action, 
                 name: name, 
@@ -1364,7 +1377,12 @@
         const dTo = document.getElementById('hist_DateTo').value;
         const fField = document.getElementById('hist_field_filter').value.toLowerCase();
 
-        const filteredLogs = onlineLogs.filter(l => {
+        let sourceLogs = [];
+        if (currentAppMode === 'DNA_cDNA') sourceLogs = onlineLogsDNA;
+        else if (currentAppMode === 'PRIMER_PROBE') sourceLogs = onlineLogsPrimer;
+        else sourceLogs = [...onlineLogsPrimer, ...onlineLogsDNA].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+        const filteredLogs = sourceLogs.filter(l => {
             const dateMatch = (!dFrom || new Date(l.ts) >= new Date(dFrom)) && (!dTo || new Date(l.ts) <= new Date(dTo));
             const searchMatch = !qText || String(l.name).toLowerCase().includes(qText) || String(l.action).toLowerCase().includes(qText) || (l.by && String(l.by).toLowerCase().includes(qText));
             let fieldMatch = true;
@@ -1402,7 +1420,12 @@
     };
 
     window.prevHistPage = function() { if (historyCurrentPage > 1) { historyCurrentPage--; renderHistory(); } };
-    window.nextHistPage = function() { if (historyCurrentPage < Math.ceil(onlineLogs.length / historyRowsPerPage)) { historyCurrentPage++; renderHistory(); } };
+    window.nextHistPage = function() { 
+        const currentLogsLength = (currentAppMode === 'DNA_cDNA') ? onlineLogsDNA.length : (currentAppMode === 'PRIMER_PROBE' ? onlineLogsPrimer.length : onlineLogsPrimer.length + onlineLogsDNA.length);
+        if (historyCurrentPage < Math.ceil(currentLogsLength / historyRowsPerPage)) { 
+            historyCurrentPage++; renderHistory(); 
+        } 
+    };
 
     window.renderTable = function(items, startIdx) {
         const tbody = document.getElementById('dataTableBody');
@@ -1639,7 +1662,7 @@
         const targetCollection = (item.itemtype === 'DNA' || item.itemtype === 'cDNA') ? DNA_COLLECTION : COLLECTION_NAME;
         try {
             await updateDoc(doc(db, targetCollection, id), { prevbox: item.box, prevslot: item.slot, box: "", slot: "", isoutofstock: true });
-            saveHistoryLog("Moved Out of Stock", item.primername, [`Storage: ${item.box}/${item.slot} -> Out of stock`]);
+            saveHistoryLog("Moved Out of Stock", item.primername, [`Storage: ${item.box}/${item.slot} -> Out of stock`], item.itemtype);
             showToast("ย้ายรายการไปที่ 'Out of stock' เรียบร้อย", "success");
         } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
     };
@@ -1649,7 +1672,7 @@
         const targetCollection = (item.itemtype === 'DNA' || item.itemtype === 'cDNA') ? DNA_COLLECTION : COLLECTION_NAME;
         try {
             await updateDoc(doc(db, targetCollection, id), { box: item.prevbox, slot: item.prevslot, isoutofstock: false });
-            saveHistoryLog("Restored Stock", item.primername, [`Out of stock -> Storage: ${item.prevbox}/${item.prevslot}`]);
+            saveHistoryLog("Restored Stock", item.primername, [`Out of stock -> Storage: ${item.prevbox}/${item.prevslot}`], item.itemtype);
             showToast("คืนค่ารายการเรียบร้อย", "success");
         } catch(e) { console.error(e); showToast("เกิดข้อผิดพลาด", "error"); }
     };
@@ -1956,8 +1979,8 @@
 
                     diffs.push(`Used: ${usageVal} ul from Slot: ${window.selectedMovementSlot || 'Main'}`);
                     diffs.push(`Slot Volume: ${oldSlotVol} -> ${newSlotVol}`);
-                    saveHistoryLog("Usage Recorded", newItem.primername, diffs);
-                } else { 
+                    saveHistoryLog("Usage Recorded", newItem.primername, diffs, newItem.itemtype);
+                } else {
                     // Edit Mode
                     newItem.initialVolume = newItem.volume; // Update total initial if edited
                     // Update initialVolumes array if editing
@@ -1968,9 +1991,9 @@
                         let newV = String(newItem[key] || '-');
                         if (oldV !== newV) diffs.push(`${labelsMap[key]}: ${oldV} -> ${newV}`);
                     });
-                    saveHistoryLog("Detail Updated", newItem.primername, diffs);
+                    saveHistoryLog("Detail Updated", newItem.primername, diffs, newItem.itemtype);
                 }
-                const targetCollection = (type === 'DNA' || type === 'cDNA') ? DNA_COLLECTION : COLLECTION_NAME;
+                const targetCollection = (type === 'DNA' || type === 'cDNA' || type === 'CDNA') ? DNA_COLLECTION : COLLECTION_NAME;
                 await updateDoc(doc(db, targetCollection, curId), newItem);
             } else {
                 newItem.orderdate = newItem.orderdate ? new Date(newItem.orderdate).toISOString() : new Date().toISOString();
@@ -1980,9 +2003,9 @@
                 newItem.isoutofstock = false;
                 const customId = generateNextID();
                 newItem.id = customId; 
-                const targetCollection = (type === 'DNA' || type === 'cDNA') ? DNA_COLLECTION : COLLECTION_NAME;
+                const targetCollection = (type === 'DNA' || type === 'cDNA' || type === 'CDNA') ? DNA_COLLECTION : COLLECTION_NAME;
                 await setDoc(doc(db, targetCollection, customId), newItem);
-                saveHistoryLog("Registered New", newItem.primername, [`ID: ${customId}`, "Initial Registration"]);
+                saveHistoryLog("Registered New", newItem.primername, [`ID: ${customId}`, "Initial Registration"], newItem.itemtype);
             }
             showToast("บันทึกสำเร็จ", "success"); toggleForm(); 
         } catch (error) {
@@ -2367,7 +2390,7 @@
         document.getElementById('confirmDeleteBtn').onclick = async () => { 
             try {
                 await deleteDoc(doc(db, targetCollection, id));
-                saveHistoryLog("Deleted Record", name); 
+                saveHistoryLog("Deleted Record", name, [], item.itemtype); 
                 document.getElementById('deleteModal').classList.add('hidden');
                 showToast("ลบข้อมูลสำเร็จ", "success");
             } catch(e) { console.error(e); showToast("ลบไม่สำเร็จ", "error"); }
