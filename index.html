@@ -960,9 +960,16 @@
                 <textarea id="seqEditInput" rows="6" class="flex-1 rounded-xl border border-slate-300 p-4 text-base font-mono uppercase focus:border-brand-500 focus:ring-2 ring-brand-100 outline-none bg-slate-50" placeholder="ATCG..."></textarea>
                 <span class="text-xl font-mono font-bold text-brand-600 pt-4">3'</span>
             </div>
-            <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeSeqEditor()" class="px-5 py-2 rounded-lg font-bold text-slate-500 hover:bg-slate-100">Cancel</button>
-                <button type="button" onclick="saveSeqEditor()" class="px-6 py-2 rounded-lg font-bold bg-brand-600 text-white shadow-md hover:bg-brand-700">Apply Changes</button>
+            <div class="flex justify-between items-center pt-2">
+                <label class="cursor-pointer px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg font-bold text-sm hover:bg-indigo-100 flex items-center gap-2 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <span id="scanTextLabel">Scan</span>
+                    <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleSequenceOCR(event)">
+                </label>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeSeqEditor()" class="px-5 py-2 rounded-lg font-bold text-slate-500 hover:bg-slate-100">Cancel</button>
+                    <button type="button" onclick="saveSeqEditor()" class="px-6 py-2 rounded-lg font-bold bg-brand-600 text-white shadow-md hover:bg-brand-700">Apply Changes</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1776,6 +1783,37 @@
             if(currentSeqTargetId === 'field_probe') updateBP('field_probe', 'probe_counter');
         }
         closeSeqEditor();
+    };
+
+    window.handleSequenceOCR = async function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const labelText = document.getElementById('scanTextLabel');
+        const originalText = labelText.innerText;
+        labelText.innerText = 'Scanning...';
+        
+        try {
+            const result = await Tesseract.recognize(file, 'eng');
+            // กรองเอาเฉพาะตัวอักษรเบส ตัดเว้นวรรคและอักขระพิเศษทิ้งอัตโนมัติ
+            let text = result.data.text.replace(/[^ATCGUatcgu]/g, '').toUpperCase();
+            
+            if (text.length > 0) {
+                const input = document.getElementById('seqEditInput');
+                input.value += text; // นำข้อความที่สแกนได้มาต่อท้าย
+                
+                input.dispatchEvent(new Event('input')); // ให้ระบบนับ bp ใหม่
+                showToast("ดึงข้อมูลเบสสำเร็จ", "success");
+            } else {
+                showToast("ไม่พบตัวอักษรเบสในรูปภาพ", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("สแกนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
+        } finally {
+            labelText.innerText = originalText;
+            event.target.value = ''; 
+        }
     };
 
     window.handleSequenceOCR = async function(event) {
