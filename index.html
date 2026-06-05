@@ -947,7 +947,11 @@
                 <h3 id="seqEditTitle" class="text-lg font-bold text-brand-700">Edit Sequence</h3>
                 <span id="seqEditCounterModal" class="text-xs font-bold bg-brand-100 text-brand-700 px-3 py-1 rounded-full">0 bp</span>
             </div>
-            <textarea id="seqEditInput" rows="6" class="w-full rounded-xl border border-slate-300 p-4 text-base font-mono uppercase focus:border-brand-500 focus:ring-2 ring-brand-100 outline-none bg-slate-50" placeholder="ATCG..."></textarea>
+            <div class="flex items-start gap-3">
+                <span class="text-xl font-mono font-bold text-brand-600 pt-4">5'</span>
+                <textarea id="seqEditInput" rows="6" class="flex-1 rounded-xl border border-slate-300 p-4 text-base font-mono uppercase focus:border-brand-500 focus:ring-2 ring-brand-100 outline-none bg-slate-50" placeholder="ATCG..."></textarea>
+                <span class="text-xl font-mono font-bold text-brand-600 pt-4">3'</span>
+            </div>
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="closeSeqEditor()" class="px-5 py-2 rounded-lg font-bold text-slate-500 hover:bg-slate-100">Cancel</button>
                 <button type="button" onclick="saveSeqEditor()" class="px-6 py-2 rounded-lg font-bold bg-brand-600 text-white shadow-md hover:bg-brand-700">Apply Changes</button>
@@ -1719,14 +1723,16 @@
     };
 
     window.updateBP = function(id, counterId) {
-        const val = document.getElementById(id).value.trim();
+        let val = document.getElementById(id).value.trim();
+        val = val.replace(/^5'?-?/i, '').replace(/-?3'?$/i, '');
         const counterEl = document.getElementById(counterId);
         if (counterEl) { counterEl.innerText = val.length + " bp."; }
     };
 
     window.openSeqEditor = function(targetId, title) {
         currentSeqTargetId = targetId;
-        const val = document.getElementById(targetId).value;
+        let val = document.getElementById(targetId).value;
+        val = val.replace(/^5'?-?/i, '').replace(/-?3'?$/i, '');
         document.getElementById('seqEditTitle').innerText = title;
         const input = document.getElementById('seqEditInput');
         input.value = val;
@@ -1752,8 +1758,9 @@
 
     window.saveSeqEditor = function() {
         if(currentSeqTargetId) {
-            const val = document.getElementById('seqEditInput').value;
-            document.getElementById(currentSeqTargetId).value = val;
+            let val = document.getElementById('seqEditInput').value.trim();
+            const formattedVal = val ? `5'-${val}-3'` : "";
+            document.getElementById(currentSeqTargetId).value = formattedVal;
             
             // Trigger updateBP
             if(currentSeqTargetId === 'field_forward') updateBP('field_forward', 'fwd_counter');
@@ -1815,7 +1822,13 @@
             if (!el) return;
             const isAllowedInMovement = ['field_usedAmount'].includes(id); 
             const isEditable = !isMovement || isAllowedInMovement;
-            el.readOnly = !isEditable; 
+            
+            if (['field_forward', 'field_Reward', 'field_probe'].includes(id)) {
+                el.readOnly = true;
+            } else {
+                el.readOnly = !isEditable; 
+            }
+            
             el.classList.toggle('bg-slate-100', !isEditable);
             el.classList.toggle('text-slate-500', !isEditable);
             if (el.tagName === 'SELECT') el.disabled = !isEditable;
@@ -1940,7 +1953,7 @@
             newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
         }
 
-        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'Reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
 
         try {
             if (curId) {
@@ -2117,7 +2130,7 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'Reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; 
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; 
         for (const [h, d] of Object.entries(map)) {    
             const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
@@ -2337,15 +2350,16 @@
             slotDetailHtml += `</div></div>`;
         }
 
-        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', Reward: 'Reward', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
+        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', reward: 'Reward', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
         document.getElementById('modalprimername').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
             let val = item[k];
             if (k === 'orderdate') val = formatDateFull(val);
             else if (val === undefined || val === null || val === '') val = '-';
-            if (['forward', 'Reward', 'probe'].includes(k) && val !== '-') {
-                val = `<div class="break-all font-mono text-xs" style="color:#1e293b;">${val}</div><div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold border border-slate-200">${String(val).replace(/<[^>]*>?/gm, '').length} bp.</span></div>`;
+            if (['forward', 'reward', 'probe'].includes(k) && val !== '-') {
+                let cleanVal = String(val).replace(/<[^>]*>?/gm, '').replace(/^5'?-?/i, '').replace(/-?3'?$/i, '');
+                val = `<div class="break-all font-mono text-xs" style="color:#1e293b;">${val}</div><div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold border border-slate-200">${cleanVal.length} bp.</span></div>`;
             } else if (k === 'attachmentname' && val !== '-') {
                 if (item.attachmentbase64) {
                     val = `<div class="font-medium underline truncate" style="color:#0284c7;"><a href="${item.attachmentbase64}" download="${val}">${val}</a></div>`;
