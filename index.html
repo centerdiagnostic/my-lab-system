@@ -52,6 +52,8 @@
             background-color: #f1f5f9;
             display: flex; align-items: center; justify-content: center;
             padding: 1rem;
+            overflow-y: auto;
+            flex-direction: column;
         }
         #login-overlay.hidden-important { display: none !important; }
         #login-overlay .hidden { display: none !important; }
@@ -62,6 +64,7 @@
             background: #ffffff; border-radius: 1.5rem;
             box-shadow: 0 25px 50px -12px rgba(15, 118, 110, 0.25);
             overflow: hidden; border: 1px solid #e2e8f0;
+            margin: auto;
         }
 
         .login-brand-side {
@@ -84,9 +87,12 @@
         }
 
         @media (max-width: 860px) {
-            .login-wrapper { flex-direction: column; max-width: 450px; min-height: auto; }
-            .login-brand-side { padding: 3rem 2rem; flex: none; }
-            .login-form-side { padding: 3rem 2rem; }
+            #login-overlay { justify-content: flex-start; padding: 2rem 1rem; }
+            .login-wrapper { flex-direction: column; max-width: 450px; min-height: auto; margin: 0 auto; }
+            .login-brand-side { padding: 2.5rem 1.5rem; flex: none; }
+            .login-form-side { padding: 2rem 1.5rem; }
+            #mascot-container { width: 9rem !important; height: 9rem !important; margin-top: 1rem !important; }
+            .brand-title { font-size: 2rem; }
         }
 
         .brand-main-icon { width: 5rem; height: 5rem; color: #ccfbf1; margin-bottom: 1.5rem; }
