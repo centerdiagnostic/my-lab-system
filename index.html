@@ -54,6 +54,7 @@
             padding: 1rem;
             overflow-y: auto;
             flex-direction: column;
+            -webkit-overflow-scrolling: touch;
         }
         #login-overlay.hidden-important { display: none !important; }
         #login-overlay .hidden { display: none !important; }
@@ -87,8 +88,8 @@
         }
 
         @media (max-width: 860px) {
-            #login-overlay { justify-content: flex-start; padding: 2rem 1rem; }
-            .login-wrapper { flex-direction: column; max-width: 450px; min-height: auto; margin: 0 auto; }
+            #login-overlay { display: block; padding: 1rem; }
+            .login-wrapper { flex-direction: column; max-width: 450px; min-height: auto; margin: 2rem auto 5rem auto; }
             .login-brand-side { padding: 2.5rem 1.5rem; flex: none; }
             .login-form-side { padding: 2rem 1.5rem; }
             #mascot-container { width: 9rem !important; height: 9rem !important; margin-top: 1rem !important; }
