@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -1768,6 +1769,37 @@
             if(currentSeqTargetId === 'field_probe') updateBP('field_probe', 'probe_counter');
         }
         closeSeqEditor();
+    };
+
+    window.handleSequenceOCR = async function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const labelText = document.getElementById('scanTextLabel');
+        const originalText = labelText.innerText;
+        labelText.innerText = 'Scanning...';
+        
+        try {
+            const result = await Tesseract.recognize(file, 'eng');
+            // กรองเอาเฉพาะตัวอักษรเบส ตัดเว้นวรรคและอักขระพิเศษทิ้งอัตโนมัติ
+            let text = result.data.text.replace(/[^ATCGUatcgu]/g, '').toUpperCase();
+            
+            if (text.length > 0) {
+                const input = document.getElementById('seqEditInput');
+                input.value += text; // นำข้อความที่สแกนได้มาต่อท้าย
+                
+                input.dispatchEvent(new Event('input')); // ให้ระบบนับ bp ใหม่
+                showToast("ดึงข้อมูลเบสสำเร็จ", "success");
+            } else {
+                showToast("ไม่พบตัวอักษรเบสในรูปภาพ", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("สแกนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
+        } finally {
+            labelText.innerText = originalText;
+            event.target.value = ''; 
+        }
     };
 
     window.addSlotField = function(slotVal = "", volVal = "") {
