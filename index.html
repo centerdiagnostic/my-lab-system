@@ -2427,7 +2427,8 @@
             slotDetailHtml += `</div></div>`;
         }
 
-        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', forward: 'Forward', reward: 'Reward', company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
+        const typeSpecific = (item.itemtype || '').toUpperCase() === 'PROBE' ? { probe: 'Probe Seq', fluorescent: 'Fluorescent' } : { forward: 'Forward', reward: 'Reward' };
+        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', ...typeSpecific, company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
         document.getElementById('modalprimername').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
