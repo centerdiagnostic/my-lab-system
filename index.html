@@ -2030,7 +2030,7 @@
             newItem.usagecount = parseInt(document.getElementById('field_usageCount').value || 0);
         }
 
-        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level' };
+        const labelsMap = { 'orderdate': 'Ordered Date', 'animaltype': 'Animal Type', 'species': 'Species', 'disease': 'Disease', 'primername': 'Name', 'originalname': 'Original Name', 'probe': 'Probe Seq', 'fluorescent': 'Fluorescent', 'targetgene': 'Target Gene', 'method': 'Method', 'forward': 'Forward', 'reward': 'Reward', 'company': 'Company', 'lotnumber': 'Lot No.', 'expirydate': 'Exp. Date', 'ta': 'TA', 'productsize': 'Size', 'box': 'Box', 'slot': 'Slot', 'volume': 'Volume', 'lowlevel': 'Low Level', 'sampletype': 'Sample Type', 'folderno': 'Nucleic Acid Type', 'result': 'Result', 'seqresult': 'Seq Result', 'remark': 'Remark' };
 
         try {
             if (curId) {
@@ -2207,7 +2207,7 @@
     window.populateForm = function(item) {
         document.getElementById('editingId').value = item.id;
         document.getElementById('field_itemType').value = item.itemtype || 'PRIMER';
-        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalname': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; 
+        const map = { 'orderDate': 'orderdate', 'animalType': 'animaltype', 'species': 'species', 'disease': 'disease', 'primerName': 'primername', 'originalName': 'originalname', 'probe': 'probe', 'fluorescent': 'fluorescent', 'targetGene': 'targetgene', 'method': 'method', 'forward': 'forward', 'Reward': 'reward', 'company': 'company', 'lotNumber': 'lotnumber', 'expiryDate': 'expirydate', 'ta': 'ta', 'productSize': 'productsize', 'box': 'box', 'volume': 'volume', 'reference': 'reference', 'usageCount': 'usagecount', 'lowLevel': 'lowlevel', 'sampleType': 'sampletype', 'folderNo': 'folderno', 'result': 'result', 'seqResult': 'seqresult', 'remark': 'remark' }; 
         for (const [h, d] of Object.entries(map)) {    
             const el = document.getElementById('field_' + h) || document.getElementById('form_' + h);
             if (el) {
@@ -2428,7 +2428,7 @@
         }
 
         const typeSpecific = (item.itemtype || '').toUpperCase() === 'PROBE' ? { probe: 'Probe Seq', fluorescent: 'Fluorescent' } : { forward: 'Forward', reward: 'Reward' };
-        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', ...typeSpecific, company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', reference: 'Reference' };
+        const labels = { id: 'ID', orderdate: 'Ordered Date', itemtype: 'Type', animaltype: 'Animal', sampletype: 'Sample Type', species: 'Species', disease: 'Disease', primername: 'Name', originalname: 'Original Name', initialVolume: 'Initial Volume (Total)', volume: 'Current Volume (Total)', usagecount: 'Total Usage', targetgene: 'Gene', method: 'Method', ...typeSpecific, company: 'Company', lotnumber: 'Lot No.', expirydate: 'Exp. Date', ta: 'TA', productsize: 'Size', folderno: 'Nucleic Acid Type', result: 'Result', seqresult: 'Seq Result', remark: 'Remark', attachmentname: 'File Attached', box: 'Box', lowlevel: 'Low Level Alert', reference: 'Reference' };
         document.getElementById('modalprimername').innerText = item.primername;
         
         let content = Object.entries(labels).map(([k, lbl]) => {
