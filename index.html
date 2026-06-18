@@ -1570,7 +1570,7 @@
             return dateMatch && global && animal && species && method && box;
         });
         
-        filteredList.sort((a, b) => new Date(b.orderdate) - new Date(a.orderdate));
+        filteredList.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
         currentPage = 1; displayCurrentPage();
     };
 
