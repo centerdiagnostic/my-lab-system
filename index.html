@@ -1469,17 +1469,28 @@
             }
 
             let actionBtns = '';
+            const canEdit = (currentUserRole === 'superadmin' || currentUserRole === 'admin');
+
             if (activeTab === 'movement') {
                 if (parseFloat(item.volume) === 0) {
-                    actionBtns = `<button onclick="moveOutOfStock('${item.id}')" class="px-3 py-1 bg-amber-500 text-white text-[10px] font-bold rounded shadow hover:bg-amber-600 uppercase">Out of stock</button>`;
+                    if (canEdit) {
+                        actionBtns = `<button onclick="moveOutOfStock('${item.id}')" class="px-3 py-1 bg-amber-500 text-white text-[10px] font-bold rounded shadow hover:bg-amber-600 uppercase">Out of stock</button>`;
+                    } else {
+                        actionBtns = `<span class="text-[10px] text-amber-500 font-bold">Empty</span>`;
+                    }
                 } else {
+                    // อนุญาตให้ User ทุกระดับกดตัดสต๊อกได้
                     actionBtns = `<button onclick="openMovementMode('${item.id}')" class="px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded shadow hover:bg-indigo-700 uppercase">Use Item</button>`;
                 }
             } else if (activeTab === 'stock' && activeStockSub === 'out-of-stock') { 
-                actionBtns = `<button onclick="undoOutOfStock('${item.id}')" class="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded shadow hover:bg-emerald-700 uppercase">Restore Stock</button>`; 
+                if (canEdit) {
+                    actionBtns = `<button onclick="undoOutOfStock('${item.id}')" class="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded shadow hover:bg-emerald-700 uppercase">Restore Stock</button>`;
+                } else {
+                    actionBtns = `<span class="text-[10px] text-slate-400">View Only</span>`;
+                }
             } 
             else if (activeTab !== 'all' && activeTab !== 'export') {
-                if (currentUserRole === 'superadmin' || currentUserRole === 'admin') {
+                if (canEdit) {
                     actionBtns = `<div class="flex justify-end gap-1">
                         <button onclick="copyItem('${item.id}')" class="btn-action" title="Copy"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
                         <button onclick="openEditMode('${item.id}')" class="btn-action" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -2506,9 +2517,93 @@
     };
     
     window.exportToExcel = function() {
-        const ws = XLSX.utils.json_to_sheet(filteredList);
+        const primers = [];
+        const probes = [];
+        const dnas = [];
+
+        filteredList.forEach(item => {
+            const type = (item.itemtype || '').toUpperCase();
+            const fd = item.orderdate ? formatDateOnly(item.orderdate) : '-';
+            
+            if (type === 'PRIMER') {
+                primers.push({
+                    "ID": item.id || '-',
+                    "Date Ordered": fd,
+                    "Animal Type": item.animaltype || '-',
+                    "Species": item.species || '-',
+                    "Disease": item.disease || '-',
+                    "Name": item.primername || '-',
+                    "Original Name": item.originalname || '-',
+                    "Method": item.method || '-',
+                    "Forward": item.forward || '-',
+                    "Reward": item.reward || '-',
+                    "TA (°C)": item.ta || '-',
+                    "Size (bp)": item.productsize || '-',
+                    "Company": item.company || '-',
+                    "Lot No.": item.lotnumber || '-',
+                    "Exp. Date": item.expirydate || '-',
+                    "Box": item.box || '-',
+                    "Slot": item.slot || '-',
+                    "Initial Volume": item.initialVolume || item.volume || 0,
+                    "Current Volume": item.volume || 0,
+                    "Usage Count": item.usagecount || 0,
+                    "Low Level": item.lowlevel || 0
+                });
+            } else if (type === 'PROBE') {
+                probes.push({
+                    "ID": item.id || '-',
+                    "Date Ordered": fd,
+                    "Animal Type": item.animaltype || '-',
+                    "Species": item.species || '-',
+                    "Disease": item.disease || '-',
+                    "Name": item.primername || '-',
+                    "Original Name": item.originalname || '-',
+                    "Method": item.method || '-',
+                    "Probe Seq": item.probe || '-',
+                    "Fluorescent": item.fluorescent || '-',
+                    "Target Gene": item.targetgene || '-',
+                    "Company": item.company || '-',
+                    "Lot No.": item.lotnumber || '-',
+                    "Exp. Date": item.expirydate || '-',
+                    "Box": item.box || '-',
+                    "Slot": item.slot || '-',
+                    "Initial Volume": item.initialVolume || item.volume || 0,
+                    "Current Volume": item.volume || 0,
+                    "Usage Count": item.usagecount || 0,
+                    "Low Level": item.lowlevel || 0
+                });
+            } else {
+                dnas.push({
+                    "ID": item.id || '-',
+                    "Date of Collected": fd,
+                    "Animal Type": item.animaltype || '-',
+                    "Sample Type": item.sampletype || '-',
+                    "Species": item.species || '-',
+                    "Disease": item.disease || '-',
+                    "Folder No./Name": item.primername || '-',
+                    "Nucleic Acid Type": item.folderno || type || '-',
+                    "Box": item.box || '-',
+                    "Slot": item.slot || '-',
+                    "Initial Volume": item.initialVolume || item.volume || 0,
+                    "Current Volume": item.volume || 0,
+                    "Usage Count": item.usagecount || 0,
+                    "Result": item.result || '-',
+                    "Seq Result": item.seqresult || '-',
+                    "Remark": item.remark || '-'
+                });
+            }
+        });
+
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "LabData");
+        if (primers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(primers), "Primer");
+        if (probes.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(probes), "Probe");
+        if (dnas.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dnas), "DNA_cDNA");
+        
+        if (primers.length === 0 && probes.length === 0 && dnas.length === 0) {
+            alert("ไม่มีข้อมูลสำหรับ Export");
+            return;
+        }
+        
         XLSX.writeFile(wb, "LabData_Export.xlsx");
     };
 
@@ -2656,21 +2751,35 @@
             const subcDNA = document.getElementById('sub-tab-stock-cDNA');
             const btnNewPrimer = document.getElementById('btn-new-primer');
             const btnNewProbe = document.getElementById('btn-new-probe');
+            const canEdit = (currentUserRole === 'superadmin' || currentUserRole === 'admin');
 
             if(mode === 'PRIMER_PROBE') {
                 if(subPrimer) subPrimer.classList.remove('hidden');
                 if(subProbe) subProbe.classList.remove('hidden');
                 if(subDna) subDna.classList.add('hidden');
                 if(subcDNA) subcDNA.classList.add('hidden');
-                if(btnNewPrimer) { btnNewPrimer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> New Primer`; btnNewPrimer.onclick = () => toggleForm('PRIMER'); }
-                if(btnNewProbe) { btnNewProbe.style.display = ''; btnNewProbe.classList.remove('hidden'); btnNewProbe.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> New Probe`; btnNewProbe.onclick = () => toggleForm('PROBE'); }
+                if(btnNewPrimer) { 
+                    btnNewPrimer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> New Primer`; 
+                    btnNewPrimer.onclick = () => toggleForm('PRIMER'); 
+                    btnNewPrimer.style.display = canEdit ? 'flex' : 'none';
+                }
+                if(btnNewProbe) { 
+                    btnNewProbe.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> New Probe`; 
+                    btnNewProbe.onclick = () => toggleForm('PROBE'); 
+                    btnNewProbe.style.display = canEdit ? 'flex' : 'none';
+                    if(canEdit) btnNewProbe.classList.remove('hidden');
+                }
                 if(activeStockSub === 'stock-dna' || activeStockSub === 'stock-cDNA') activeStockSub = 'stock-primer';
             } else if(mode === 'DNA_cDNA') {
                 if(subPrimer) subPrimer.classList.add('hidden');
                 if(subProbe) subProbe.classList.add('hidden');
                 if(subDna) subDna.classList.remove('hidden');
                 if(subcDNA) subcDNA.classList.remove('hidden');
-                if(btnNewPrimer) { btnNewPrimer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>  Add New`; btnNewPrimer.onclick = () => toggleForm('DNA'); }
+                if(btnNewPrimer) { 
+                    btnNewPrimer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>  Add New`; 
+                    btnNewPrimer.onclick = () => toggleForm('DNA'); 
+                    btnNewPrimer.style.display = canEdit ? 'flex' : 'none';
+                }
                 if(btnNewProbe) { btnNewProbe.style.display = 'none'; }
                 if(activeStockSub === 'stock-primer' || activeStockSub === 'stock-probe') activeStockSub = 'stock-dna';
             }
